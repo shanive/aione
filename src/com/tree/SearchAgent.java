@@ -27,7 +27,7 @@ public class SearchAgent extends Agent {
 			HeuristicFunction heuristic, Comparator<Node> compare, int depthSearch){
 			this.ID = id;
 			this.goal = target;
-			this.h = heuristic;
+			this.h = heuristic;//initialized
 			this.position = initial;
 			this.actions = new LinkedList<ATPmove>();
 			this.repeatedStates = new LinkedList<ATPstate>();
@@ -56,6 +56,8 @@ public class SearchAgent extends Agent {
 		while(true){
 			if (queue.isEmpty()) return null; //fail
 			Node node = queue.remove();
+			System.out.println("entering state with node="+node.getState().getAgentPosition(this.ID)+" into repeated states");
+			this.repeatedStates.add(node.getState());
 			if ((iteration == this.depth) && (this.depth == 1)) return node.getAction(); //greedy
 			//else if (iteration == this.depth) return this.bestMove(node);//TODO rta*
 			if (this.goalTest(node.getState())){
@@ -106,19 +108,19 @@ public class SearchAgent extends Agent {
 
 		//update heuristic
 		Vector<ATPmove> availableMoves = this.availableMoves(node.getState());
-		this.h.initHeuristic(node.getState().getAgentPosition(this.ID), availableMoves);
 		//start expanding
 		while (!availableMoves.isEmpty())
 		{
 			ATPmove move = availableMoves.remove(0);
 			ATPstate state = new ATPstate(node.getState());
+			double h_value = this.h.evaluate(state, move);
 			double price = this.simulateMove(state , move) + node.getPathCost();
 			if (!this.repeated(state)){
-				double h_value = this.h.evaluate(state);
 				Node child = new Node(state, move, node, price, h_value, this.comparator);
 				successors.add(0, child);
 				queue.add(child);
-				this.repeatedStates.add(state);
+			} else {
+				System.out.println("repeated state on move to "+move.getTarget());
 			}
 		}
 		node.setSuccessors(successors);

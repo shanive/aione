@@ -1,7 +1,6 @@
 package com.tree;
 
 import java.util.Iterator;
-import java.util.Vector;
 
 import com.ATP.ATPedge;
 import com.ATP.ATPgraph;
@@ -16,13 +15,12 @@ public class GreedyHeuristic implements HeuristicFunction{
 	private int m_agentID;
 	private int m_goal;
 	private DijkstraEngine m_dijkstra;
-	private DenseRoutesMap map;
 
 	public GreedyHeuristic(int agentID, int goal){
 		this.m_agentID = agentID;
 		this.m_goal = goal;
 		this.m_dijkstra = null;
-		this.map = null;
+		this.initHeuristic();
 	}
 
 	private double[] findBestVehicles(Iterator<ATPvehicle> it){
@@ -55,52 +53,57 @@ public class GreedyHeuristic implements HeuristicFunction{
 	}
 
 
-	public void initHeuristic(int source, Vector<ATPmove> availableMoves){
-		this.map = new DenseRoutesMap(ATPgraph.instance().verticesNum());
-		//for every possible move, if it has the lower price, update it
-		Iterator<ATPmove> it = availableMoves.iterator();
-		while(it.hasNext()){
-			ATPmove move = it.next();
-			ATPedge edge = ATPgraph.instance().getEdge(source, move.getTarget());
-			ATPvehicle vehicle = ATPgraph.instance().getVehicle(move.getVehicleID());
-			double weight = this.map.getDistance(City.valueOf(source), City.valueOf(move.getTarget()));
+	public void initHeuristic(){
 
-			if (edge.isFlooded() && (vehicle.getEff()>0) && (edge.getWeight() / vehicle.speedFlooded() < weight))
-				this.map.addDirectRoute(City.valueOf(source), City.valueOf(move.getTarget()), edge.getWeight() / vehicle.speedFlooded());
-			else if (!edge.isFlooded() && (edge.getWeight() / vehicle.speedUnflooded() < weight))
-				this.map.addDirectRoute(City.valueOf(source), City.valueOf(move.getTarget()), edge.getWeight() / vehicle.speedUnflooded());
-		}
-		//update weights of other edges with the assumption that all vehicle are-
-		//available in every vertex, that is why we'll choose the best vehicles
-		double[] speed = this.findBestVehicles(ATPgraph.instance().vehiclesIter());
-		for(int i = 0; i < ATPgraph.instance().verticesNum(); i++){
-			this.updateEdgesWeightOnMap(this.map, ATPgraph.instance().neighboursOfIterate(i), speed[0], speed[1]);
-		}
+		DenseRoutesMap map = new DenseRoutesMap(ATPgraph.instance().verticesNum());
 
+		double[] best = this.findBestVehicles(ATPgraph.instance().vehiclesIter());
+		//update weights
+		for(int i = 1; i < ATPgraph.instance().verticesNum(); i++){
+			this.updateEdgesWeightOnMap(map, ATPgraph.instance().neighboursOfIterate(i), best[0], best[1]);
+		}
 		for(int idist = 0; idist!=map.distances.length; ++idist) {
 			for(int jdist = 0; jdist!=map.distances[idist].length; ++jdist) {
 				System.out.print(" "+map.distances[idist][jdist]);
 			}
 			System.out.println();
 		}
-		this.m_dijkstra = new DijkstraEngine(this.map);
-		this.m_dijkstra.execute(City.valueOf(source), City.valueOf(this.m_goal));
-		System.out.println("SHORTEST PATH:");
-		for (City city = City.valueOf(this.m_goal); city != null; city = this.m_dijkstra.getPredecessor(city))
-		{
-			System.out.print(" "+city.getName());
-		}
+
+		this.m_dijkstra = new DijkstraEngine(map);
+		this.m_dijkstra.execute(City.valueOf(this.m_goal), null);
+		System.out.println("SHORTEST PATH");
+		for (City city = City.valueOf(1); city != null; city = this.m_dijkstra.getPredecessor(city))
+	    {
+			System.out.print(city.getName()+" ");
+	    }
 		System.out.println();
 		System.out.println("SHORTEST DISTANCES:");
-		for (int i = 0; i!=map.distances.length; ++i) {
-			System.out.println("distance("+source+", "+i+")="+this.m_dijkstra.getShortestDistance(City.valueOf(i)));
+		for (int i = 1; i!=map.distances.length; ++i) {
+			System.out.println("distance("+this.m_goal+", "+i+")="+this.m_dijkstra.getShortestDistance(City.valueOf(i)));
 		}
 	}
 
 	@Override
-	public double evaluate(ATPstate state) {
+	public double evaluate(ATPstate state, ATPmove move) {
+		//compute h(state.getAgentPosition(this.m_agentID))
 		int pos = state.getAgentPosition(this.m_agentID);
-		return this.m_dijkstra.getShortestDistance(City.valueOf(pos));
+		double cost_rest = this.m_dijkstra.getShortestDistance(City.valueOf(move.getTarget()));
+		double cost_first = 0.0, cost_switch = 0.0;
+		//add move cost to cost
+		int currentVehicle = state.agentVehicle(this.m_agentID);
+		if (currentVehicle != move.getVehicleID())
+			cost_switch = ATPgraph.instance().getTswitch(); //need to switch vehicle
+		//compute speed
+		ATPedge edge = ATPgraph.instance().getEdge(pos, move.getTarget());
+		ATPvehicle vehicle = ATPgraph.instance().getVehicle(move.getVehicleID());
+		if (edge.isFlooded())
+			cost_first = ((double)edge.getWeight() / vehicle.speedFlooded());
+		else
+			cost_first = ((double)edge.getWeight() / vehicle.speedUnflooded());
+		double cost = cost_switch + cost_first + cost_rest;
+		System.out.println("target="+move.getTarget()+
+						   " edge_weight(raw)="+edge.getWeight()+" speed_flooded="+vehicle.speedFlooded()+" cost="+cost+" cost_switch="+cost_switch+" cost_first="+cost_first+" cost_rest="+cost_rest);
+		return cost;
 	}
 
 }

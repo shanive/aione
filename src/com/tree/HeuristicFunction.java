@@ -3,7 +3,6 @@
  */
 package com.tree;
 
-import java.util.Vector;
 
 import com.ATP.ATPstate;
 import com.ATP.ATPmove;
@@ -18,8 +17,8 @@ public interface HeuristicFunction {
 	 * @param state the state we want to evaluate
 	 * @return the evaluation score
 	 */
-	public double evaluate(ATPstate state);
+	public double evaluate(ATPstate state, ATPmove move);
 
-	public void initHeuristic(int source, Vector<ATPmove> availableMoves);
+	public void initHeuristic();
 
 }

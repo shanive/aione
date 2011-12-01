@@ -173,7 +173,7 @@ public class DijkstraEngine
         for (City v : map.getDestinations(u))
         {
             // skip node already settled
-            if (isSettled(v)) continue;
+            // if (isSettled(v)) continue;
 
             double uv = map.getDistance(u, v);
             System.out.println("u="+u.getName()+" v="+v.getName()+" uv="+uv+" sdu="+getShortestDistance(u)+" sdv="+getShortestDistance(v));
