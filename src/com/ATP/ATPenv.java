@@ -18,9 +18,11 @@ public class ATPenv {
 	Vector<Agent> agents_list;
 	Vector<AgentScore> agents_scores;
 	ATPstate state;
+	boolean m_batch;
 	public DenseRoutesMap map; //needs to change to private when done testing//TODO
 
-	public ATPenv(String file){
+	public ATPenv(String file, boolean batch) {
+		m_batch = batch;
 		initEnv(file);
 		this.agents_scores = new Vector<AgentScore>();
 		for (int i = 0; i < this.agents_list.size(); i++)
@@ -214,13 +216,17 @@ public class ATPenv {
 		BufferedReader reader = new BufferedReader(
 				new InputStreamReader(System.in));
 		boolean gameover = false;
-		while (!gameover)
+		boolean all_done = false;
+		while (!(gameover || all_done))
 		{
 			Iterator<Agent> it = this.agents_list.iterator();
-			while(!gameover && it.hasNext()){
+			all_done = true;
+			while(it.hasNext()){
 				Agent agent = it.next();
 				if (agent.reachedGoal()){
 					continue;
+				} else {
+					all_done = false;
 				}
 				ATPmove move = agent.nextMove(this.state);
 				if (move != null){//no available move
@@ -240,18 +246,24 @@ public class ATPenv {
 			}
 			this.state.printer();
 			this.printScores();
-			System.out.println("Continue Simulation? y/n");
-			try {
-				String input = reader.readLine();
-				if (input.compareTo("n") == 0)
-					gameover = true;
-				else if (input.compareTo("y") != 0){
-					System.err.println("Wrong Input.");
-					System.exit(1);
+			if(!m_batch) {
+				System.out.println("Continue Simulation? y/n");
+				while(true) {
+						try {
+							String input = reader.readLine();
+							if (input.compareTo("n") == 0) {
+								gameover = true;
+								break;
+							} else if (input.compareTo("y") == 0) {
+								break;
+							} else {
+								System.err.println("Wrong Input.");
+							}
+						} catch (IOException e) {
+							System.err.println("Simulation failed reading input.");
+							e.printStackTrace();
+						}
 				}
-			} catch (IOException e) {
-				System.err.println("Simulation failed reading input.");
-				e.printStackTrace();
 			}
 		}
 		System.out.println("bye bye.");
