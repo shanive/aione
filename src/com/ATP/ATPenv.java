@@ -11,7 +11,8 @@ import com.waldura.tw.City;
 import com.waldura.tw.DenseRoutesMap;
 import com.waldura.tw.DijkstraEngine;
 import com.tree.AstarAgent;
-import com.tree.GreedySearch;;
+import com.tree.GreedySearch;
+import com.tree.RTAstar;
 
 
 public class ATPenv {
@@ -41,17 +42,33 @@ public class ATPenv {
 	}
 
 	private Agent createAgent(String name, int id, int initial, int goal){
-		if (name.compareTo("human") == 0)
-			return new Human(id, initial, goal);
-		else if (name.compareTo("speed") == 0)
-			return new SpeedNutAutomaton(id, initial, goal);
-		else if (name.compareTo("greedy") == 0)
-			return new Greedy(id, initial, goal);
-		else if (name.compareTo("greedy-search") == 0)
-			return new GreedySearch(id, initial, goal);
-		else if (name.compareTo("a*") == 0)
-			return new AstarAgent(id, initial, goal);
-		else error();
+		try {
+			if (name.compareTo("human") == 0)
+				return new Human(id, initial, goal);
+			else if (name.compareTo("speed") == 0)
+				return new SpeedNutAutomaton(id, initial, goal);
+			else if (name.compareTo("greedy") == 0)
+				return new Greedy(id, initial, goal);
+			else if (name.compareTo("greedy-search") == 0)
+				return new GreedySearch(id, initial, goal);
+			else if (name.compareTo("A*") == 0)
+				return new AstarAgent(id, initial, goal);
+			else if (name.compareTo("RTA*") == 0){
+				BufferedReader userInputReader = new BufferedReader(
+						new InputStreamReader(System.in));
+				System.out.println("Enter RTA* max depth:");
+				int depth;
+				depth = Integer.parseInt(userInputReader.readLine());
+				return new RTAstar(id, initial, goal, depth);
+			}
+			else error();
+		} catch (NumberFormatException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return null;
 	}
 
@@ -97,7 +114,7 @@ public class ATPenv {
 			BufferedReader userInputReader = new BufferedReader(
 					new InputStreamReader(System.in));
 			System.out.println("Enter Tswitch:");
-			int tswitch = Integer.parseInt(userInputReader.readLine());
+			double tswitch = Double.parseDouble(userInputReader.readLine());
 
 
 			ATPgraph.initiate(filterEdges(allEdges, maxV), vehicles, tswitch);
@@ -232,6 +249,7 @@ public class ATPenv {
 				} else {
 					all_done = false;
 				}
+				agent.repeatedStates.add(this.state);
 				ATPmove move = agent.nextMove(this.state);
 				if (move != null){//no available move
 					System.out.println(move);//TODO

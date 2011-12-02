@@ -19,7 +19,6 @@ import com.ATP.*;
 public class SearchAgent extends Agent {
 	HeuristicFunction h;
 	LinkedList<ATPmove> actions = null;
-	LinkedList<ATPstate> repeatedStates;
 	Comparator<Node> comparator;
 	int depth;
 
@@ -30,7 +29,6 @@ public class SearchAgent extends Agent {
 			this.h = heuristic;//initialized
 			this.position = initial;
 			this.actions = null;
-			this.repeatedStates = new LinkedList<ATPstate>();
 			this.comparator = new NodesComparator();
 			this.depth = depthSearch;
 	}
@@ -63,7 +61,6 @@ public class SearchAgent extends Agent {
 			if (queue.isEmpty()) return null; //fail
 			Node node = queue.remove();
 			System.out.println("entering state with node="+node.getState().getAgentPosition(this.ID)+" into repeated states");
-			this.repeatedStates.add(node.getState());
 			if (iteration == this.depth || this.goalTest(node.getState())){
 				return this.firstAction(node); //backtracking
 			}
