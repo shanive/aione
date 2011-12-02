@@ -86,23 +86,7 @@ public class GreedyHeuristic implements HeuristicFunction{
 	@Override
 	public double evaluate(ATPstate state, ATPmove move) {
 		//compute h(state.getAgentPosition(this.m_agentID))
-		int pos = state.getAgentPosition(this.m_agentID);
-		double cost_rest = this.m_dijkstra.getShortestDistance(City.valueOf(move.getTarget()));
-		double cost_first = 0.0, cost_switch = 0.0;
-		//add move cost to cost
-		int currentVehicle = state.agentVehicle(this.m_agentID);
-		if (currentVehicle != move.getVehicleID())
-			cost_switch = ATPgraph.instance().getTswitch(); //need to switch vehicle
-		//compute speed
-		ATPedge edge = ATPgraph.instance().getEdge(pos, move.getTarget());
-		ATPvehicle vehicle = ATPgraph.instance().getVehicle(move.getVehicleID());
-		if (edge.isFlooded())
-			cost_first = ((double)edge.getWeight() / vehicle.speedFlooded());
-		else
-			cost_first = ((double)edge.getWeight() / vehicle.speedUnflooded());
-		double cost = cost_switch + cost_first + cost_rest;
-		System.out.println("target="+move.getTarget()+
-						   " edge_weight(raw)="+edge.getWeight()+" speed_flooded="+vehicle.speedFlooded()+" cost="+cost+" cost_switch="+cost_switch+" cost_first="+cost_first+" cost_rest="+cost_rest);
+		double cost = this.m_dijkstra.getShortestDistance(City.valueOf(move.getTarget()));
 		return cost;
 	}
 

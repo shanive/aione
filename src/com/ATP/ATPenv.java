@@ -15,6 +15,7 @@ import com.tree.GreedySearch;;
 
 
 public class ATPenv {
+	Vector<Vector<ATPmove>> agents_moves;
 	Vector<Agent> agents_list;
 	Vector<AgentScore> agents_scores;
 	ATPstate state;
@@ -25,10 +26,13 @@ public class ATPenv {
 		m_batch = batch;
 		initEnv(file);
 		this.agents_scores = new Vector<AgentScore>();
+		this.agents_moves = new Vector<Vector<ATPmove>>();
 		for (int i = 0; i < this.agents_list.size(); i++)
 		{
+			this.agents_moves.add(new Vector<ATPmove>());
 			this.agents_scores.add(new AgentScore());
 		}
+
 	}
 
 	private void error(){
@@ -156,7 +160,7 @@ public class ATPenv {
 	private double executeMove(Agent agent, ATPmove move)
 	{
 		//default large values to discorage illegal moves
-		int weight = 1000;
+		double weight = 1000;
 		double vel = 1.0;
 		int vehID = move.getVehicleID();
 		int agent_pos = this.state.getAgentPosition(agent.getID());
@@ -236,6 +240,7 @@ public class ATPenv {
 					AgentScore score = this.agents_scores.get(agent.getID());
 					score.addStep();
 					score.addTime(price);
+					this.agents_moves.get(agent.getID()).add(move);
 				}
 				else{//release the vehicle that the agent have
 					int vehicle = this.state.agentVehicle(agent.getID());
@@ -265,6 +270,15 @@ public class ATPenv {
 						}
 				}
 			}
+		}
+		System.out.println("Agents' Moves:");
+		for(int i = 0; i < this.agents_list.size();i++){
+			System.out.print("Agent "+i+": ");
+			Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
+			while (moves.hasNext()){
+				System.out.print(moves.next()+", ");
+			}
+			System.out.println("");
 		}
 		System.out.println("bye bye.");
 	}

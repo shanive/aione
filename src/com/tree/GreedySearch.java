@@ -12,7 +12,7 @@ public class GreedySearch extends SearchAgent{
 	 */
 	public GreedySearch(int id, int initial, int target)
 	{
-		super(id, initial, target, new GreedyHeuristic(id, target), new GreedyComparator(), 1);
+		super(id, initial, target, new GreedyHeuristic(id, target), 1);
 	}
 
 }

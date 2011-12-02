@@ -10,7 +10,7 @@ public class SpeedNutAutomaton extends Agent{
 	private int prev_position;
 	private HashMap<Integer,Integer> past_positions;
 	private boolean reachedGoal;
-	
+
 	public SpeedNutAutomaton(int id, int initial, int goalv){
 		this.ID = id;
 		this.goal = goalv;
@@ -20,7 +20,7 @@ public class SpeedNutAutomaton extends Agent{
 		this.reachedGoal = false; //this is true if we reached the same vertex 3 times
 		this.past_positions = new HashMap<Integer, Integer>();
 	}
-	
+
 	public String toString(){
 		return "SpeedNutAutomated("+this.ID+", "+this.goal+")";
 	}
@@ -36,25 +36,25 @@ public class SpeedNutAutomaton extends Agent{
 		} else {
 			this.past_positions.put(this.position, 1);
 		}
-		
+
 		if(this.past_positions.get(this.position)==3){
 			this.reachedGoal = true;
 		}
-		
+
 		if(!reachedGoal()){
-			Vector<ATPedge> neighbours = 
+			Vector<ATPedge> neighbours =
 				ATPgraph.instance().neighboursOf(this.position);
 			//sort neighbours by weight value
 			Collections.sort(neighbours, new Comparator<ATPedge>(){
 					public int compare(ATPedge o1, ATPedge o2){
-						int diff = o1.getWeight() - o2.getWeight();
-						if ((diff > 0) || 
+						double diff = o1.getWeight() - o2.getWeight();
+						if ((diff > 0) ||
 							((diff == 0) && (o1.getTarget() < o2.getSource())))
 							return -1;
 						else return 1;
 					}});
 			//Vector<ATPvehicle> vehicles = state.getVehiclesAt(this.position);
-		
+
 			//gets the vehicleID of the fastest available water vehicle (at [0]) and regular car (at [1]) or -1 if there is no such vehicles
 			int[] cars = getWaterAndFastestVehicle(state);
 			//go through the sorted edges and choose the heaviest can be crossed
@@ -86,13 +86,13 @@ public class SpeedNutAutomaton extends Agent{
 		Vector<ATPvehicle> vehicles = state.getVehiclesAt(this.position);
 		int[] ans = {-1,-1};
 		double fastestWater = 0;
-		int fastestRegular = 0;
+		double fastestRegular = 0.0;
 		Iterator<ATPvehicle> it = vehicles.iterator();
 		while(it.hasNext()){
 			ATPvehicle car = it.next();
 			if(state.isVehicleAvailable(car.getVehicleId()) || state.getVehicleOwner(car.getVehicleId())==this.ID){
 				double floodedSpeed = car.speedFlooded();
-				int regularSpeed = car.speedUnflooded();
+				double regularSpeed = car.speedUnflooded();
 				int vehID = car.getVehicleId();
 				if(floodedSpeed>fastestWater){
 					ans[0] = vehID;
@@ -111,11 +111,11 @@ public class SpeedNutAutomaton extends Agent{
 	public boolean reachedGoal() {
 		return ((this.goal == this.position)|(this.reachedGoal));
 	}
-	
+
 	@Override
 	public void setPosition(int i){
 		this.prev_position = this.position;
 		this.position = i;
 	}
-	
+
 }

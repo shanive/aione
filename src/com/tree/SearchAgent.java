@@ -18,20 +18,20 @@ import com.ATP.*;
  */
 public class SearchAgent extends Agent {
 	HeuristicFunction h;
-	LinkedList<ATPmove> actions;
+	LinkedList<ATPmove> actions = null;
 	LinkedList<ATPstate> repeatedStates;
 	Comparator<Node> comparator;
 	int depth;
 
 	public SearchAgent(int id, int initial, int target,
-			HeuristicFunction heuristic, Comparator<Node> compare, int depthSearch){
+			HeuristicFunction heuristic, int depthSearch){
 			this.ID = id;
 			this.goal = target;
 			this.h = heuristic;//initialized
 			this.position = initial;
-			this.actions = new LinkedList<ATPmove>();
+			this.actions = null;
 			this.repeatedStates = new LinkedList<ATPstate>();
-			this.comparator = compare;
+			this.comparator = new NodesComparator();
 			this.depth = depthSearch;
 	}
 
@@ -46,8 +46,15 @@ public class SearchAgent extends Agent {
 	private ATPmove Search(ATPstate state){
 		BinaryHeap<Node> queue = new BinaryHeap<Node>(); //the constructor should get an array Node[] with all the nodes, and then he'll sort them in O(n).
 
+		if(this.depth==-1 && this.actions != null) {
+			try {
+				return actions.remove(0);
+			} catch(IndexOutOfBoundsException e) {
+				return null;
+			}
+		}
+
 		//initialization:
-		this.actions.clear();
 		Node root = new Node(state, null, null, 0.0, 0.0, this.comparator);//the heuristic value is not important because at first iteration this node is pulled out of queue
 		this.repeatedStates.add(state);
 		queue.add(root);
@@ -58,9 +65,7 @@ public class SearchAgent extends Agent {
 			Node node = queue.remove();
 			System.out.println("entering state with node="+node.getState().getAgentPosition(this.ID)+" into repeated states");
 			this.repeatedStates.add(node.getState());
-			if ((iteration == this.depth) && (this.depth == 1)) return node.getAction(); //greedy
-			//else if (iteration == this.depth) return this.bestMove(node);//TODO rta*
-			if (this.goalTest(node.getState())){
+			if (iteration == this.depth || this.goalTest(node.getState())){
 				return this.firstAction(node); //backtracking
 			}
 			this.expand(node, queue);
@@ -69,6 +74,7 @@ public class SearchAgent extends Agent {
 	}
 
 	private ATPmove firstAction(Node node){
+		this.actions = new LinkedList<ATPmove>();
 		while ((node != null) && (node.getAction() != null)){
 			this.actions.add(0, node.getAction());
 			node = node.getParent();
@@ -115,6 +121,7 @@ public class SearchAgent extends Agent {
 			ATPstate state = new ATPstate(node.getState());
 			double h_value = this.h.evaluate(state, move);
 			double price = this.simulateMove(state , move) + node.getPathCost();
+			System.out.println("target="+move.getTarget()+" price="+price+" h_value="+h_value);
 			if (!this.repeated(state)){
 				Node child = new Node(state, move, node, price, h_value, this.comparator);
 				successors.add(0, child);
@@ -130,30 +137,38 @@ public class SearchAgent extends Agent {
 	//return move price
 	private double simulateMove(ATPstate state, ATPmove move)
 	{
-		double price = 0.0;
+		double cost = 0.0;
+		double cost_switch = 0.0;
+		double cost_move = 0.0;
 		int agent_pos = state.getAgentPosition(this.getID());
 		ATPedge edge = ATPgraph.instance().getEdge(agent_pos, move.getTarget());
 		ATPvehicle vehicle = state.getVehicleAt(move.getVehicleID(), agent_pos);
-		//if agent switch vehicle, release the old one
 		int myVehId = state.agentVehicle(this.ID);
-		//change vehicle
+		//release old vehicle
 		if ((myVehId != -1) && (myVehId != move.getVehicleID())){
 			state.setVehicleAvailable(myVehId);
 		}
+		//switch
 		if (myVehId != move.getVehicleID()){
-			price += ATPgraph.instance().getTswitch();
+			cost_switch += ATPgraph.instance().getTswitch();
 			state.setVehicleOwner(move.getVehicleID(), this.getID());//update vehicle's owner
 		}
 		//even if agent didn't change vehicle, the vehicle moves with agent
 		state.moveVeh(agent_pos, move.getTarget(), move.getVehicleID());//update vehicle's position
+		state.setAgentPosition(this.getID(), move.getTarget());//update agent's position on state
+
 		double speed = 0.0;
 		if (edge.isFlooded())
 			speed = vehicle.speedFlooded();
 		else
 			speed = vehicle.speedUnflooded();
-		state.setAgentPosition(this.getID(), move.getTarget());//update agent's position on state
-		price += (edge.getWeight() / speed);
-		return price;
+
+		cost_move += ((double)edge.getWeight() / speed);
+
+		cost = cost_switch + cost_move;
+		System.out.println("target="+move.getTarget()+
+				" edge_weight(raw)="+edge.getWeight()+" speed_flooded="+vehicle.speedFlooded()+" cost="+cost+" cost_switch="+cost_switch+" cost_move="+cost_move);
+		return cost;
 	}
 
 	private boolean goalTest(ATPstate state){
