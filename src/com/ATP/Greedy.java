@@ -1,23 +1,47 @@
 package com.ATP;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
 
-import com.waldura.tw.City;
-import com.waldura.tw.DijkstraEngine;
-
+import com.special.dijkstra.City;
+import com.special.dijkstra.DenseRoutesMap;
+import com.special.dijkstra.DijkstraEngine;
 
 public class Greedy extends Agent {
 
-	private Vector<Integer> moves;
+	private Vector<Integer> path;
 
 	public Greedy(int id, int initial, int goalv){
 		this.ID = id;
 		this.goal = goalv;
 		this.position = initial;
 		this.vehicleId = -1;
-		this.moves = null;
+		this.path = null;
+		this.findBestPath();
 	}
+	
+	private void findBestPath(){
+		//initiate map
+		DenseRoutesMap map = new DenseRoutesMap(ATPgraph.instance().verticesNum());
+		//update edges' weights
+		for(int i = 0; i < ATPgraph.instance().verticesNum(); i++){
+			Iterator<ATPedge> it = ATPgraph.instance().neighboursOfIterate(i);
+			while (it.hasNext()){
+				ATPedge edge = it.next();
+				map.addDirectRoute(City.valueOf(edge.getSource()), City.valueOf(edge.getTarget()), edge.getWeight());
+			}
+		}
+		//initial dijkstra
+		DijkstraEngine engine = new DijkstraEngine(map);
+		engine.execute(City.valueOf(this.position), null);
+		//retrieve path from engine
+		this.path = new Vector<Integer>();
+		for(City city = City.valueOf(this.goal); city != null; engine.getPredecessor(city)){
+			System.out.print(city.getName()+" ");
+			this.path.add(0, city.getName());
+		}
+		System.out.println("Found Path");
+	}
+	
 
 	public String toString(){
 		return "Greedy("+this.ID+", "+this.goal+")";
@@ -29,44 +53,24 @@ public class Greedy extends Agent {
 
 	@Override
 	public ATPmove nextMove(ATPstate state) {
-
-		if(moves == null){
-			DijkstraEngine.instance().execute(City.valueOf(state.getAgentPosition(this.ID)), City.valueOf(this.goal));
-			Vector<Integer> l = new Vector<Integer>();
-
-			 for (City city = City.valueOf(this.goal); city != null; city = DijkstraEngine.instance().getPredecessor(city))
-			 {
-			     l.add(city.getName());
-			 }
-
-			 Collections.reverse(l);
-			 this.moves = l;
-			 this.moves.remove(0);
+		
+		if ((this.path == null) || (this.path.isEmpty())){
+				System.out.println("empty path");
+				return null;
 		}
-
-		if(this.goal != this.position){
-			boolean isFlooded;
-			int car = this.vehicleId;
-			try {
-				isFlooded = checkIfNextEdgeIsFlooded(this.position, moves.firstElement().intValue());
-				//search for new car only if the edge is flooded and our current car is incompatible
-				if (isFlooded )
-					if (((car!= -1) && (state.getVehicleAt(this.vehicleId, this.position).getEff() == 0))
-							|| (car==-1)){
-						car = FindFloatingVehicle(this.position, state);
-					} else {}
-				else if (car==-1) car = FindRegularVehicle(this.position, state);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			if (car== -1) return null;
-			return new ATPmove(moves.remove(0).intValue(), car);
-		} else return null;
-	}
-
-	private boolean checkIfNextEdgeIsFlooded(int v, int u){
-		return ATPgraph.instance().getEdge(v, u).isFlooded();
+		boolean isFlooded;
+		int car = state.agentVehicle(this.ID);
+		isFlooded = ATPgraph.instance().getEdge(this.position, this.path.get(0)).isFlooded();
+		//search for new car only if the edge is flooded and our current car is incompatible
+		if (isFlooded )
+			if (((car!= -1) && (ATPgraph.instance().getVehicle(car).getEff() == 0))
+					|| (car==-1)){
+				car = FindFloatingVehicle(this.position, state);
+			} else {}
+		else if (car==-1) car = FindRegularVehicle(this.position, state);
+		if (car== -1) return null;
+		return new ATPmove(this.path.remove(0).intValue(), car);
+	
 	}
 
 	private int FindRegularVehicle(int pos, ATPstate state)

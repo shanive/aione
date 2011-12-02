@@ -6,10 +6,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Vector;
-
-import com.waldura.tw.City;
-import com.waldura.tw.DenseRoutesMap;
-import com.waldura.tw.DijkstraEngine;
 import com.tree.AstarAgent;
 import com.tree.GreedySearch;
 import com.tree.RTAstar;
@@ -21,7 +17,6 @@ public class ATPenv {
 	Vector<AgentScore> agents_scores;
 	ATPstate state;
 	boolean m_batch;
-	public DenseRoutesMap map; //needs to change to private when done testing//TODO
 
 	public ATPenv(String file, boolean batch) {
 		m_batch = batch;
@@ -80,7 +75,6 @@ public class ATPenv {
 			String line;
 			int maxV = 0; //to know what is the max Vertex number
 			int verticesNum = Integer.parseInt(br.readLine().split(" ")[1]);
-			this.map = new DenseRoutesMap(verticesNum+1);
 			this.state = new ATPstate(verticesNum);
 			int vehicleCount = 0;
 			while((line = br.readLine()) != null){
@@ -96,8 +90,6 @@ public class ATPenv {
 
 					allEdges.add(new ATPedge(source, target, w, f));
 					allEdges.add(new ATPedge(target, source, w, f));
-					this.map.addDirectRoute(City.valueOf(source), City.valueOf(target), w);
-					this.map.addDirectRoute(City.valueOf(target), City.valueOf(source), w);
 				}
 				else if (Tokens[0].compareTo("#V") == 0){
 					int to = Integer.parseInt(Tokens[1]);
@@ -109,7 +101,6 @@ public class ATPenv {
 					vehicleCount +=1;
 				}
 			}
-			DijkstraEngine.initDijkstra(this.map);
 			this.state.initVehiclesOwners(vehicleCount);
 			BufferedReader userInputReader = new BufferedReader(
 					new InputStreamReader(System.in));
