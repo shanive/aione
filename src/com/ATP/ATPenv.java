@@ -9,9 +9,11 @@ import java.util.Vector;
 import com.tree.AstarAgent;
 import com.tree.GreedySearch;
 import com.tree.RTAstar;
+import com.tree.SearchAgent;
 
 
 public class ATPenv {
+	final int f = 1;
 	Vector<Vector<ATPmove>> agents_moves;
 	Vector<Agent> agents_list;
 	Vector<AgentScore> agents_scores;
@@ -288,6 +290,12 @@ public class ATPenv {
 				System.out.print(moves.next()+", ");
 			}
 			System.out.println("");
+			if (this.agents_list.get(i) instanceof SearchAgent){
+				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
+				double p = this.f*this.agents_scores.get(i).getTime() + agent.expandCount;
+				System.out.println("P = "+p);
+			}
+			
 		}
 		System.out.println("bye bye.");
 	}

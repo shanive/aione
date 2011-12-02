@@ -21,6 +21,7 @@ public class SearchAgent extends Agent {
 	LinkedList<ATPmove> actions = null;
 	Comparator<Node> comparator;
 	int depth;
+	public int expandCount;
 
 	public SearchAgent(int id, int initial, int target,
 			HeuristicFunction heuristic, int depthSearch){
@@ -31,6 +32,7 @@ public class SearchAgent extends Agent {
 			this.actions = null;
 			this.comparator = new NodesComparator();
 			this.depth = depthSearch;
+			this.expandCount = 0;
 	}
 
 
@@ -107,7 +109,7 @@ public class SearchAgent extends Agent {
 
 	private void expand(Node node, BinaryHeap<Node> queue) {
 		ArrayList<Node> successors = new ArrayList<Node>();
-
+		this.expandCount += 1; 
 		//update heuristic
 		Vector<ATPmove> availableMoves = this.availableMoves(node.getState());
 		//start expanding
