@@ -56,7 +56,6 @@ public class SearchAgent extends Agent {
 
 		//initialization:
 		Node root = new Node(state, null, null, 0.0, 0.0, this.comparator);//the heuristic value is not important because at first iteration this node is pulled out of queue
-		this.repeatedStates.add(state);
 		queue.add(root);
 		int iteration = 0;
 		//start search
@@ -79,7 +78,7 @@ public class SearchAgent extends Agent {
 			this.actions.add(0, node.getAction());
 			node = node.getParent();
 		}
-		return this.actions.getFirst();
+		return this.actions.remove(0);
 	}
 
 	private boolean repeated(ATPstate state){
