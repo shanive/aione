@@ -7,9 +7,9 @@ import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Vector;
 
-import com.waldura.tw.City;
-import com.waldura.tw.DenseRoutesMap;
-import com.waldura.tw.DijkstraEngine;
+import com.special.dijkstra.City;
+import com.special.dijkstra.DenseRoutesMap;
+import com.special.dijkstra.DijkstraEngine;
 import com.tree.AstarAgent;
 import com.tree.GreedySearch;
 import com.tree.RTAstar;
