@@ -3,8 +3,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
 
-import com.special.dijkstra.City;
-import com.special.dijkstra.DijkstraEngine;
+import com.waldura.tw.City;
+import com.waldura.tw.DijkstraEngine;
 
 
 public class Greedy extends Agent {
