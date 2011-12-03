@@ -1,13 +1,10 @@
 package com.special.dijkstra;
 
 /**
- * A city is identified by its name, a single uppercase character.
- * Conversions to/from characters are handled by 
- * {@link #getName()} and {@link #valueOf(char)}, respectively.
- * <p>
- * Package members are also given access to an identity relationship between
- * cities and numbers: they can converts between <code>City</code>
- * instances and numbers using {@link #valueOf(int)} and {@link #getIndex()}.
+ * A city is identified by its index.
+ * Package members are given access to an identity relationship between
+ * cities and indices: they can convert between <code>City</code>
+ * instances and indexs using {@link #valueOf(int)} and {@link #getIndex()}.
  * This special relationship is used by the
  * {@link com.waldura.tw.DenseRoutesMap DensesRoutesMap} 
  * to store cities in an array.
@@ -21,115 +18,54 @@ public final class City implements Comparable<City>
 	/**
 	 * The largest possible number of cities.
 	 */
-	public static final int MAX_NUMBER = 200;
+	public static final int MAX_NUMBER = 1000;
 	
 	private static final City[] cities = new City[MAX_NUMBER];
 
-	static
+	private int index;
+
+	public static City valueOf(int index)
 	{
-        // initialize all City objects
-		for (char c = 'A'; c <= 'Z'; c++)
-		{
-			cities[getIndexForName(c)] = new City(c);
-		}		
-	}
-		
-	private static int getIndexForName(char name)
-	{
-		return name - 'A';
-	}	
-	
-	private static char getNameForIndex(int index)
-	{
-		return (char)('A' + index);
-	}	
-	
-	public static final City A = City.valueOf('A');
-	public static final City B = City.valueOf('B');
-	public static final City C = City.valueOf('C');
-	public static final City D = City.valueOf('D');
-	public static final City E = City.valueOf('E');
-    public static final City F = City.valueOf('F');
-	
-	static City valueOf(char name)
-	{
-		if (name < 'A' || name > 'Z')
-		{
-			throw new IllegalArgumentException("Invalid city name: " + name);	
-		}
-		
-		return cities[getIndexForName(name)];
-	}
-	
-    /*
-     * Package members only.
-     */
-	public static City valueOf(int n)
-	{
-		if (n < 0 || n > 200)
-		{
-			throw new IllegalArgumentException("Invalid city number: " + n);
-		}
-		
-		return valueOf( getNameForIndex(n) );		
+		if(cities[index]==null)
+			cities[index] = new City(index);
+		return cities[index];
 	}
 
-	private final char name;
+	public int getIndex() {
+		return index;
+	}
 	
     /**
      * Private constructor.
-     * @param name
+     * @param index
      */
-	private City(char name)
+	private City(int index)
 	{
-		this.name = name;	
+		this.index = index;	
 	}
 
-	public int getName()
-	{
-		return (name- 'A');	
-	}
-	
-	
-    /*
-     * Package members only.
-     */
-	int getIndex()
-	{
-		return getIndexForName(name);
-	}	
-	
-    /**
-     * @see java.lang.Object#toString()
-     */
 	public String toString()
 	{
-		return ""+(name - 'A');//String.valueOf(name);
+		return String.valueOf(index);
 	}
 
     /**
-     * Two cities are considered equal if they are the same object,
-     * or their names are the same.
+     * Two cities are considered equal if they are the same object.
      * 
      * @see java.lang.Object#equals(Object)
      */    
     public boolean equals(Object o)
     {
-        return this == o || equals((City) o);
+        return this == o;
     }
     
-    private boolean equals(City c)
-    {
-        return this.name == c.name;
-    }
-
     /**
-     * Compare two cities by name.
+     * Compare two cities by index.
      * 
      * @see java.lang.Comparable#compareTo(Object)
      */
     public int compareTo(City c)
     {
-        return this.name - c.name;
+        return this.index - c.index;
     }
 }

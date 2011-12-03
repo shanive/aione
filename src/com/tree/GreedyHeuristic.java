@@ -74,7 +74,7 @@ public class GreedyHeuristic implements HeuristicFunction{
 		System.out.println("SHORTEST PATH");
 		for (City city = City.valueOf(1); city != null; city = this.m_dijkstra.getPredecessor(city))
 	    {
-			System.out.print(city.getName()+" ");
+			System.out.print(city.getIndex()+" ");
 	    }
 		System.out.println();
 		System.out.println("SHORTEST DISTANCES:");

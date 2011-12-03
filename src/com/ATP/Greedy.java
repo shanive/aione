@@ -32,12 +32,12 @@ public class Greedy extends Agent {
 		}
 		//initial dijkstra
 		DijkstraEngine engine = new DijkstraEngine(map);
-		engine.execute(City.valueOf(this.position), null);
+		engine.execute(City.valueOf(this.position), City.valueOf(this.goal));
 		//retrieve path from engine
 		this.path = new Vector<Integer>();
-		for(City city = City.valueOf(this.goal); city != null; engine.getPredecessor(city)){
-			System.out.print(city.getName()+" ");
-			this.path.add(0, city.getName());
+		for(City city = City.valueOf(this.goal); city != null; city = engine.getPredecessor(city)){
+			System.out.print(city.getIndex()+" ");
+			this.path.add(0, city.getIndex());
 		}
 		System.out.println("Found Path");
 	}
