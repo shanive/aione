@@ -21,6 +21,7 @@ public class SearchAgent extends Agent {
 	LinkedList<ATPmove> actions = null;
 	Comparator<Node> comparator;
 	int depth;
+	public int expandCount;
 
 	public SearchAgent(int id, int initial, int target,
 			HeuristicFunction heuristic, int depthSearch){
@@ -31,6 +32,7 @@ public class SearchAgent extends Agent {
 			this.actions = null;
 			this.comparator = new NodesComparator();
 			this.depth = depthSearch;
+			this.expandCount = 0;
 	}
 
 
@@ -60,8 +62,10 @@ public class SearchAgent extends Agent {
 		while(true){
 			if (queue.isEmpty()) return null; //fail
 			Node node = queue.remove();
-			System.out.println("entering state with node="+node.getState().getAgentPosition(this.ID)+" into repeated states");
-			if (iteration == this.depth || this.goalTest(node.getState())){
+			if (Debug.instance().isDebugOn()){
+				System.out.println("entering state with node="+node.getState().getAgentPosition(this.ID)+" into repeated states");
+			}
+				if (iteration == this.depth || this.goalTest(node.getState())){
 				return this.firstAction(node); //backtracking
 			}
 			this.expand(node, queue);
@@ -107,7 +111,7 @@ public class SearchAgent extends Agent {
 
 	private void expand(Node node, BinaryHeap<Node> queue) {
 		ArrayList<Node> successors = new ArrayList<Node>();
-
+		this.expandCount += 1; 
 		//update heuristic
 		Vector<ATPmove> availableMoves = this.availableMoves(node.getState());
 		//start expanding
@@ -117,12 +121,15 @@ public class SearchAgent extends Agent {
 			ATPstate state = new ATPstate(node.getState());
 			double h_value = this.h.evaluate(state, move);
 			double price = this.simulateMove(state , move) + node.getPathCost();
-			System.out.println("target="+move.getTarget()+" price="+price+" h_value="+h_value);
+			if (Debug.instance().isDebugOn()){
+				System.out.println("target="+move.getTarget()+" price="+price+" h_value="+h_value);
+			}
 			if (!this.repeated(state)){
 				Node child = new Node(state, move, node, price, h_value, this.comparator);
 				successors.add(0, child);
 				queue.add(child);
-			} else {
+			} else if (Debug.instance().isDebugOn()){
+				
 				System.out.println("repeated state on move to "+move.getTarget());
 			}
 		}
@@ -162,8 +169,11 @@ public class SearchAgent extends Agent {
 		cost_move += ((double)edge.getWeight() / speed);
 
 		cost = cost_switch + cost_move;
-		System.out.println("target="+move.getTarget()+
+		
+		if (Debug.instance().isDebugOn()){
+			System.out.println("target="+move.getTarget()+
 				" edge_weight(raw)="+edge.getWeight()+" speed_flooded="+vehicle.speedFlooded()+" cost="+cost+" cost_switch="+cost_switch+" cost_move="+cost_move);
+		}
 		return cost;
 	}
 

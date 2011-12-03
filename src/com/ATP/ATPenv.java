@@ -6,22 +6,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Vector;
-
-import com.waldura.tw.City;
-import com.waldura.tw.DenseRoutesMap;
-import com.waldura.tw.DijkstraEngine;
 import com.tree.AstarAgent;
 import com.tree.GreedySearch;
 import com.tree.RTAstar;
+import com.tree.SearchAgent;
 
 
 public class ATPenv {
+	final int f = 1;
 	Vector<Vector<ATPmove>> agents_moves;
 	Vector<Agent> agents_list;
 	Vector<AgentScore> agents_scores;
 	ATPstate state;
 	boolean m_batch;
-	public DenseRoutesMap map; //needs to change to private when done testing//TODO
 
 	public ATPenv(String file, boolean batch) {
 		m_batch = batch;
@@ -33,7 +30,6 @@ public class ATPenv {
 			this.agents_moves.add(new Vector<ATPmove>());
 			this.agents_scores.add(new AgentScore());
 		}
-
 	}
 
 	private void error(){
@@ -41,7 +37,8 @@ public class ATPenv {
 		System.exit(1);
 	}
 
-	private Agent createAgent(String name, int id, int initial, int goal){
+	private Agent createAgent(BufferedReader userInputReader,
+							  String name, int id, int initial, int goal){
 		try {
 			if (name.compareTo("human") == 0)
 				return new Human(id, initial, goal);
@@ -54,8 +51,6 @@ public class ATPenv {
 			else if (name.compareTo("A*") == 0)
 				return new AstarAgent(id, initial, goal);
 			else if (name.compareTo("RTA*") == 0){
-				BufferedReader userInputReader = new BufferedReader(
-						new InputStreamReader(System.in));
 				System.out.println("Enter RTA* max depth:");
 				int depth;
 				depth = Integer.parseInt(userInputReader.readLine());
@@ -63,10 +58,10 @@ public class ATPenv {
 			}
 			else error();
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Failed to read input");
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Failed to read input");
 			e.printStackTrace();
 		}
 		return null;
@@ -78,11 +73,22 @@ public class ATPenv {
 			Vector<ATPedge> allEdges = new Vector<ATPedge>();
 			Vector<ATPvehicle> vehicles = new Vector<ATPvehicle>();
 			String line;
-			int maxV = 0; //to know what is the max Vertex number
-			int verticesNum = Integer.parseInt(br.readLine().split(" ")[1]);
-			this.map = new DenseRoutesMap(verticesNum+1);
-			this.state = new ATPstate(verticesNum);
+			int verticesNum = -1;
+			int maxV = -1;
 			int vehicleCount = 0;
+
+			while((line = br.readLine()) != null) {
+				String[] tokens = line.split(" ");
+				if(tokens[0].compareTo("#V") == 0) {
+					System.out.println("line="+line);
+					verticesNum = Integer.parseInt(tokens[1]);
+					break;
+				}
+			}
+			this.state = new ATPstate(verticesNum);
+			maxV = verticesNum;
+			
+			// parse list of edges and vehices, #V means vehicle now
 			while((line = br.readLine()) != null){
 				String[] Tokens = line.split(" ");
 				if (Tokens[0].compareTo("#E") == 0){
@@ -96,8 +102,6 @@ public class ATPenv {
 
 					allEdges.add(new ATPedge(source, target, w, f));
 					allEdges.add(new ATPedge(target, source, w, f));
-					this.map.addDirectRoute(City.valueOf(source), City.valueOf(target), w);
-					this.map.addDirectRoute(City.valueOf(target), City.valueOf(source), w);
 				}
 				else if (Tokens[0].compareTo("#V") == 0){
 					int to = Integer.parseInt(Tokens[1]);
@@ -109,7 +113,6 @@ public class ATPenv {
 					vehicleCount +=1;
 				}
 			}
-			DijkstraEngine.initDijkstra(this.map);
 			this.state.initVehiclesOwners(vehicleCount);
 			BufferedReader userInputReader = new BufferedReader(
 					new InputStreamReader(System.in));
@@ -130,9 +133,10 @@ public class ATPenv {
 				String[] inputs = userInputReader.readLine().split(" ");
 				if (inputs.length != 3) error();
 				agents_positions.addElement(Integer.parseInt(inputs[0]));
-				Agent agent = this.createAgent(inputs[2], i,
-									Integer.parseInt(inputs[0]),
-									Integer.parseInt(inputs[1]));
+				Agent agent = this.createAgent(userInputReader,
+											   inputs[2], i,
+											   Integer.parseInt(inputs[0]),
+											   Integer.parseInt(inputs[1]));
 				this.agents_list.add(agent);
 			}
 
@@ -252,7 +256,9 @@ public class ATPenv {
 				agent.repeatedStates.add(this.state);
 				ATPmove move = agent.nextMove(this.state);
 				if (move != null){//no available move
-					System.out.println(move);//TODO
+					if (Debug.instance().isDebugOn()){
+						System.out.println("Agent's move:"+move);
+					}
 					double price = this.executeMove(agent, move);
 					//update agent's score
 					AgentScore score = this.agents_scores.get(agent.getID());
@@ -289,15 +295,26 @@ public class ATPenv {
 				}
 			}
 		}
-		System.out.println("Agents' Moves:");
+		if (Debug.instance().isDebugOn()){
+			System.out.println("Agents' Moves:");
+			for(int i = 0; i < this.agents_list.size();i++){
+				System.out.print("Agent "+i+": ");
+				Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
+				while (moves.hasNext()){
+					System.out.print(moves.next()+", ");
+				}
+				System.out.println("");
+			}
+		}
 		for(int i = 0; i < this.agents_list.size();i++){
 			System.out.print("Agent "+i+": ");
-			Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
-			while (moves.hasNext()){
-				System.out.print(moves.next()+", ");
+			if (this.agents_list.get(i) instanceof SearchAgent){
+				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
+				double p = this.f*this.agents_scores.get(i).getTime() + agent.expandCount;
+				System.out.println("P = "+p);
 			}
-			System.out.println("");
 		}
+			
 		System.out.println("bye bye.");
 	}
 
@@ -316,6 +333,20 @@ public class ATPenv {
 
 	public String toString(){
 		return ATPgraph.instance().toString();
+	}
+	
+	public static void main(String[] args) {
+		if (args.length == 0){
+			System.out.println("Usage: <input-file> <debug>");
+			System.exit(1);
+		}
+		if ((args.length > 1) && (args[1].compareTo("true") == 0)){
+			Debug.initDebug(true);
+		}else{
+			Debug.initDebug(false);
+		}
+		ATPenv env = new ATPenv(args[0], args.length==2);
+		env.RunEnv();
 	}
 
 }
