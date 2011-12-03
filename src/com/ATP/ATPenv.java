@@ -264,6 +264,9 @@ public class ATPenv {
 					score.addStep();
 					score.addTime(price);
 					this.agents_moves.get(agent.getID()).add(move);
+				} else if(batch && this.agents_list.size()==1) {
+					gameover = true;
+					break;
 				}
 				else{//release the vehicle that the agent have
 					int vehicle = this.state.agentVehicle(agent.getID());
