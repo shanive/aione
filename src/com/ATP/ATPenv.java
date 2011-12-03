@@ -80,14 +80,13 @@ public class ATPenv {
 			while((line = br.readLine()) != null) {
 				String[] tokens = line.split(" ");
 				if(tokens[0].compareTo("#V") == 0) {
-					System.out.println("line="+line);
 					verticesNum = Integer.parseInt(tokens[1]);
 					break;
 				}
 			}
 			this.state = new ATPstate(verticesNum);
 			maxV = verticesNum;
-			
+
 			// parse list of edges and vehices, #V means vehicle now
 			while((line = br.readLine()) != null){
 				String[] Tokens = line.split(" ");
@@ -314,7 +313,7 @@ public class ATPenv {
 				System.out.println("P = "+p);
 			}
 		}
-			
+
 		System.out.println("bye bye.");
 	}
 
@@ -334,18 +333,24 @@ public class ATPenv {
 	public String toString(){
 		return ATPgraph.instance().toString();
 	}
-	
+
 	public static void main(String[] args) {
 		if (args.length == 0){
-			System.out.println("Usage: <input-file> <debug>");
+			System.out.println("Usage: [-d|-b] <input-file>");
 			System.exit(1);
 		}
-		if ((args.length > 1) && (args[1].compareTo("true") == 0)){
-			Debug.initDebug(true);
-		}else{
-			Debug.initDebug(false);
+		boolean debug = false, batch = false;
+		int iarg = 0;
+		while(iarg != args.length) {
+			if(args[iarg].compareTo("-d")==0) {
+				debug = true;
+			} else if(args[iarg].compareTo("-b")==0) {
+				batch = true;
+			} else break;
+			++iarg;
 		}
-		ATPenv env = new ATPenv(args[0], args.length==2);
+		Debug.initDebug(debug);
+		ATPenv env = new ATPenv(args[iarg], batch);
 		env.RunEnv();
 	}
 
