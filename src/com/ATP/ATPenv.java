@@ -30,7 +30,6 @@ public class ATPenv {
 			this.agents_moves.add(new Vector<ATPmove>());
 			this.agents_scores.add(new AgentScore());
 		}
-
 	}
 
 	private void error(){
@@ -59,10 +58,10 @@ public class ATPenv {
 			}
 			else error();
 		} catch (NumberFormatException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Failed to read input");
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Failed to read input");
 			e.printStackTrace();
 		}
 		return null;
@@ -257,7 +256,9 @@ public class ATPenv {
 				agent.repeatedStates.add(this.state);
 				ATPmove move = agent.nextMove(this.state);
 				if (move != null){//no available move
-					System.out.println(move);//TODO
+					if (Debug.instance().isDebugOn()){
+						System.out.println("Agent's move:"+move);
+					}
 					double price = this.executeMove(agent, move);
 					//update agent's score
 					AgentScore score = this.agents_scores.get(agent.getID());
@@ -294,21 +295,26 @@ public class ATPenv {
 				}
 			}
 		}
-		System.out.println("Agents' Moves:");
+		if (Debug.instance().isDebugOn()){
+			System.out.println("Agents' Moves:");
+			for(int i = 0; i < this.agents_list.size();i++){
+				System.out.print("Agent "+i+": ");
+				Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
+				while (moves.hasNext()){
+					System.out.print(moves.next()+", ");
+				}
+				System.out.println("");
+			}
+		}
 		for(int i = 0; i < this.agents_list.size();i++){
 			System.out.print("Agent "+i+": ");
-			Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
-			while (moves.hasNext()){
-				System.out.print(moves.next()+", ");
-			}
-			System.out.println("");
 			if (this.agents_list.get(i) instanceof SearchAgent){
 				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
 				double p = this.f*this.agents_scores.get(i).getTime() + agent.expandCount;
 				System.out.println("P = "+p);
 			}
-			
 		}
+			
 		System.out.println("bye bye.");
 	}
 
@@ -327,6 +333,20 @@ public class ATPenv {
 
 	public String toString(){
 		return ATPgraph.instance().toString();
+	}
+	
+	public static void main(String[] args) {
+		if (args.length == 0){
+			System.out.println("Usage: <input-file> <debug>");
+			System.exit(1);
+		}
+		if ((args.length > 1) && (args[1].compareTo("true") == 0)){
+			Debug.initDebug(true);
+		}else{
+			Debug.initDebug(false);
+		}
+		ATPenv env = new ATPenv(args[0], args.length==2);
+		env.RunEnv();
 	}
 
 }

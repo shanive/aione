@@ -7,6 +7,7 @@ import com.ATP.ATPgraph;
 import com.ATP.ATPstate;
 import com.ATP.ATPvehicle;
 import com.ATP.ATPmove;
+import com.ATP.Debug;
 import com.special.dijkstra.City;
 import com.special.dijkstra.DenseRoutesMap;
 import com.special.dijkstra.DijkstraEngine;
@@ -62,24 +63,28 @@ public class GreedyHeuristic implements HeuristicFunction{
 		for(int i = 1; i < ATPgraph.instance().verticesNum(); i++){
 			this.updateEdgesWeightOnMap(map, ATPgraph.instance().neighboursOfIterate(i), best[0], best[1]);
 		}
-		for(int idist = 0; idist!=map.distances.length; ++idist) {
-			for(int jdist = 0; jdist!=map.distances[idist].length; ++jdist) {
-				System.out.print(" "+map.distances[idist][jdist]);
+		
+		if (Debug.instance().isDebugOn()){
+			for(int idist = 0; idist!=map.distances.length; ++idist) {
+				for(int jdist = 0; jdist!=map.distances[idist].length; ++jdist) {
+					System.out.print(" "+map.distances[idist][jdist]);
+				}
+				System.out.println();
 			}
-			System.out.println();
 		}
-
 		this.m_dijkstra = new DijkstraEngine(map);
 		this.m_dijkstra.execute(City.valueOf(this.m_goal), null);
-		System.out.println("SHORTEST PATH");
-		for (City city = City.valueOf(1); city != null; city = this.m_dijkstra.getPredecessor(city))
-	    {
-			System.out.print(city.getIndex()+" ");
-	    }
-		System.out.println();
-		System.out.println("SHORTEST DISTANCES:");
-		for (int i = 1; i!=map.distances.length; ++i) {
-			System.out.println("distance("+this.m_goal+", "+i+")="+this.m_dijkstra.getShortestDistance(City.valueOf(i)));
+		if (Debug.instance().isDebugOn()){
+			System.out.println("SHORTEST PATH");
+			for (City city = City.valueOf(1); city != null; city = this.m_dijkstra.getPredecessor(city))
+		    {
+				System.out.print(city.getIndex()+" ");
+		    }
+			System.out.println();
+			System.out.println("SHORTEST DISTANCES:");
+			for (int i = 1; i!=map.distances.length; ++i) {
+				System.out.println("distance("+this.m_goal+", "+i+")="+this.m_dijkstra.getShortestDistance(City.valueOf(i)));
+			}
 		}
 	}
 

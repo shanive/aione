@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import com.ATP.Debug;
+
 
 /**
  * An implementation of Dijkstra's shortest path algorithm. It computes the shortest path (in distance)
@@ -176,8 +178,10 @@ public class DijkstraEngine
             //if (isSettled(v)) continue;
 
             double uv = map.getDistance(u, v);
-            System.out.println("u="+u.getIndex()+" v="+v.getIndex()+" uv="+uv+" sdu="+getShortestDistance(u)+" sdv="+getShortestDistance(v));
-            double shortDist = getShortestDistance(u) + uv;
+            if (Debug.instance().isDebugOn()){
+            	System.out.println("u="+u.getIndex()+" v="+v.getIndex()+" uv="+uv+" sdu="+getShortestDistance(u)+" sdv="+getShortestDistance(v));
+            }
+        	double shortDist = getShortestDistance(u) + uv;
 
             if (shortDist < getShortestDistance(v))
             {
