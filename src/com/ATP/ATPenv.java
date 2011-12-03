@@ -13,15 +13,15 @@ import com.tree.SearchAgent;
 
 
 public class ATPenv {
-	final int f = 1;
 	Vector<Vector<ATPmove>> agents_moves;
 	Vector<Agent> agents_list;
 	Vector<AgentScore> agents_scores;
 	ATPstate state;
-	boolean m_batch;
 
-	public ATPenv(String file, boolean batch) {
-		m_batch = batch;
+	// configurable parameters, see main
+	static boolean batch = false, print_state = false;
+
+	public ATPenv(String file) {
 		initEnv(file);
 		this.agents_scores = new Vector<AgentScore>();
 		this.agents_moves = new Vector<Vector<ATPmove>>();
@@ -252,7 +252,7 @@ public class ATPenv {
 				} else {
 					all_done = false;
 				}
-				agent.repeatedStates.add(this.state);
+				agent.repeatedStates.add(new ATPstate(this.state));
 				ATPmove move = agent.nextMove(this.state);
 				if (move != null){//no available move
 					if (Debug.instance().isDebugOn()){
@@ -272,9 +272,15 @@ public class ATPenv {
 					}
 				}
 			}
-			this.state.printer();
+			if(print_state)
+				this.state.printer();
+			else {// still print the current node
+				for(int i = 0; i < this.agents_list.size(); i++){
+					System.out.println("Agent "+i+" position: "+ this.state.getAgentPosition(i));
+				}
+			}
 			this.printScores();
-			if(!m_batch) {
+			if(!batch) {
 				System.out.println("Continue Simulation? y/n");
 				while(true) {
 						try {
@@ -305,8 +311,9 @@ public class ATPenv {
 			System.out.println("");
 			if (this.agents_list.get(i) instanceof SearchAgent){
 				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
-				double p = this.f*this.agents_scores.get(i).getTime() + agent.expandCount;
-				System.out.println("P = "+p);
+				double S = this.agents_scores.get(i).getTime(),
+					   T = agent.expandCount;
+				System.out.println("P(1) = "+(1.0*S+T)+" P(100.0)="+(100.0*S+T)+" P(10000.0)="+(10000.0*S+T));
 			}
 		}
 
@@ -332,21 +339,23 @@ public class ATPenv {
 
 	public static void main(String[] args) {
 		if (args.length == 0){
-			System.out.println("Usage: [-d|-b] <input-file>");
+			System.out.println("Usage: [-d|-b|-s <value>] <input-file>");
 			System.exit(1);
 		}
-		boolean debug = false, batch = false;
+		boolean debug = false;
 		int iarg = 0;
 		while(iarg != args.length) {
 			if(args[iarg].compareTo("-d")==0) {
 				debug = true;
 			} else if(args[iarg].compareTo("-b")==0) {
 				batch = true;
+			} else if(args[iarg].compareTo("-s")==0) {
+				print_state = true;
 			} else break;
 			++iarg;
 		}
 		Debug.initDebug(debug);
-		ATPenv env = new ATPenv(args[iarg], batch);
+		ATPenv env = new ATPenv(args[iarg]);
 		env.RunEnv();
 	}
 
