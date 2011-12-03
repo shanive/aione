@@ -1,99 +1,100 @@
+
 Graph: 500graph
 Algorithm: greedy
 Agent 0: move(target: 4, vehicle: 0), move(target: 9, vehicle: 0), move(target: 14, vehicle: 0), move(target: 9, vehicle: 13), move(target: 14, vehicle: 13), move(target: 15, vehicle: 13), move(target: 12, vehicle: 13), move(target: 17, vehicle: 13), move(target: 18, vehicle: 13), move(target: 21, vehicle: 13), move(target: 22, vehicle: 13), 
-P(1) = 17.688166768853463 P(100.0)=679.8166768853464 P(10000.0)=66892.66768853464
+P(0.001)=11.006688166768853 P(1) = 17.688166768853463 P(100.0)=679.8166768853464 P(10000.0)=66892.66768853464
 
 Graph: 500graph
 Algorithm: rta-3
 Agent 0: move(target: 4, vehicle: 0), move(target: 9, vehicle: 0), move(target: 4, vehicle: 8), move(target: 9, vehicle: 8), move(target: 14, vehicle: 8), move(target: 15, vehicle: 8), move(target: 12, vehicle: 8), move(target: 17, vehicle: 8), move(target: 18, vehicle: 8), move(target: 21, vehicle: 8), move(target: 22, vehicle: 8), 
-P(1) = 36.262276785714285 P(100.0)=656.2276785714286 P(10000.0)=62652.767857142855
+P(0.001)=30.006262276785716 P(1) = 36.262276785714285 P(100.0)=656.2276785714286 P(10000.0)=62652.767857142855
 
 Graph: 500graph
 Algorithm: rta-6
 Agent 0: move(target: 2, vehicle: 0), move(target: 3, vehicle: 1), move(target: 2, vehicle: 1), move(target: 5, vehicle: 1), move(target: 8, vehicle: 1), move(target: 11, vehicle: 1), move(target: 12, vehicle: 1), move(target: 17, vehicle: 1), move(target: 18, vehicle: 1), move(target: 21, vehicle: 1), move(target: 22, vehicle: 1), 
-P(1) = 65.0726618705036 P(100.0)=864.2661870503597 P(10000.0)=80783.61870503596
+P(0.001)=57.00807266187051 P(1) = 65.0726618705036 P(100.0)=864.2661870503597 P(10000.0)=80783.61870503596
 
 Graph: 500graph
 Algorithm: rta-10
 Agent 0: move(target: 4, vehicle: 0), move(target: 9, vehicle: 0), move(target: 4, vehicle: 8), move(target: 9, vehicle: 8), move(target: 14, vehicle: 8), move(target: 19, vehicle: 8), move(target: 22, vehicle: 8), 
-P(1) = 65.22879464285714 P(100.0)=681.8794642857143 P(10000.0)=62346.946428571435
+P(0.001)=59.00622879464286 P(1) = 65.22879464285714 P(100.0)=681.8794642857143 P(10000.0)=62346.946428571435
 
 Graph: 500graph
 Algorithm: a
 Agent 0: move(target: 4, vehicle: 0), move(target: 9, vehicle: 0), move(target: 14, vehicle: 8), move(target: 19, vehicle: 8), move(target: 22, vehicle: 8), 
-P(1) = 127.21763392857143 P(100.0)=742.7633928571429 P(10000.0)=62297.33928571429
+P(0.001)=121.00621763392857 P(1) = 127.21763392857143 P(100.0)=742.7633928571429 P(10000.0)=62297.33928571429
 
 Graph: test-14x9
 Algorithm: greedy
 Agent 0: move(target: 4, vehicle: 1), move(target: 9, vehicle: 1), move(target: 14, vehicle: 1), 
-P(1) = 4.55 P(100.0)=158.0 P(10000.0)=15503.0
+P(0.001)=3.00155 P(1) = 4.55 P(100.0)=158.0 P(10000.0)=15503.0
 
 Graph: test-14x9
 Algorithm: rta-3
 Agent 0: move(target: 4, vehicle: 1), move(target: 9, vehicle: 1), move(target: 14, vehicle: 1), 
-P(1) = 7.55 P(100.0)=161.0 P(10000.0)=15506.0
+P(0.001)=6.00155 P(1) = 7.55 P(100.0)=161.0 P(10000.0)=15506.0
 
 Graph: test-14x9
 Algorithm: rta-6
 Agent 0: move(target: 4, vehicle: 1), move(target: 9, vehicle: 1), move(target: 14, vehicle: 1), 
-P(1) = 8.55 P(100.0)=162.0 P(10000.0)=15507.0
+P(0.001)=7.00155 P(1) = 8.55 P(100.0)=162.0 P(10000.0)=15507.0
 
 Graph: test-14x9
 Algorithm: rta-10
 Agent 0: move(target: 4, vehicle: 1), move(target: 9, vehicle: 1), move(target: 14, vehicle: 1), 
-P(1) = 8.55 P(100.0)=162.0 P(10000.0)=15507.0
+P(0.001)=7.00155 P(1) = 8.55 P(100.0)=162.0 P(10000.0)=15507.0
 
 Graph: test-14x9
 Algorithm: a
 Agent 0: move(target: 4, vehicle: 1), move(target: 9, vehicle: 1), move(target: 14, vehicle: 1), 
-P(1) = 5.55 P(100.0)=159.0 P(10000.0)=15504.0
+P(0.001)=4.00155 P(1) = 5.55 P(100.0)=159.0 P(10000.0)=15504.0
 
 Graph: test-7x4
 Algorithm: greedy
 Agent 0: move(target: 2, vehicle: 0), move(target: 1, vehicle: 0), move(target: 2, vehicle: 1), move(target: 1, vehicle: 1), move(target: 3, vehicle: 1), move(target: 6, vehicle: 1), move(target: 7, vehicle: 1), 
-P(1) = 9.61 P(100.0)=268.00000000000006 P(10000.0)=26107.000000000004
+P(0.001)=7.00261 P(1) = 9.61 P(100.0)=268.00000000000006 P(10000.0)=26107.000000000004
 
 Graph: test-7x4
 Algorithm: rta-3
 Agent 0: move(target: 2, vehicle: 0), move(target: 1, vehicle: 2), move(target: 2, vehicle: 2), move(target: 4, vehicle: 2), move(target: 7, vehicle: 2), 
-P(1) = 15.405000000000001 P(100.0)=253.50000000000003 P(10000.0)=24063.000000000004
+P(0.001)=13.002405 P(1) = 15.405000000000001 P(100.0)=253.50000000000003 P(10000.0)=24063.000000000004
 
 Graph: test-7x4
 Algorithm: rta-6
 Agent 0: move(target: 2, vehicle: 0), move(target: 5, vehicle: 2), move(target: 2, vehicle: 2), move(target: 4, vehicle: 2), move(target: 7, vehicle: 2), 
-P(1) = 24.445 P(100.0)=266.5 P(10000.0)=24472.000000000004
+P(0.001)=22.002445 P(1) = 24.445 P(100.0)=266.5 P(10000.0)=24472.000000000004
 
 Graph: test-7x4
 Algorithm: rta-10
 Agent 0: move(target: 2, vehicle: 0), move(target: 1, vehicle: 0), move(target: 2, vehicle: 1), move(target: 4, vehicle: 1), move(target: 7, vehicle: 1), 
-P(1) = 37.39 P(100.0)=274.0 P(10000.0)=23935.0
+P(0.001)=35.00239 P(1) = 37.39 P(100.0)=274.0 P(10000.0)=23935.0
 
 Graph: test-7x4
 Algorithm: a
 Agent 0: move(target: 2, vehicle: 1), move(target: 4, vehicle: 1), move(target: 7, vehicle: 1), 
-P(1) = 32.34 P(100.0)=165.0 P(10000.0)=13431.0
+P(0.001)=31.00134 P(1) = 32.34 P(100.0)=165.0 P(10000.0)=13431.0
 
 Graph: test-4x4
 Algorithm: greedy
 Agent 0: move(target: 2, vehicle: 2), move(target: 1, vehicle: 2), move(target: 3, vehicle: 2), 
-P(1) = 5.066666666666666 P(100.0)=110.66666666666667 P(10000.0)=10670.666666666666
+P(0.001)=4.0010666666666665 P(1) = 5.066666666666666 P(100.0)=110.66666666666667 P(10000.0)=10670.666666666666
 
 Graph: test-4x4
 Algorithm: rta-3
 Agent 0: move(target: 2, vehicle: 0), move(target: 3, vehicle: 0), move(target: 4, vehicle: 0), 
-P(1) = 7.1125 P(100.0)=117.24999999999999 P(10000.0)=11130.999999999998
+P(0.001)=6.0011125 P(1) = 7.1125 P(100.0)=117.24999999999999 P(10000.0)=11130.999999999998
 
 Graph: test-4x4
 Algorithm: rta-6
 Agent 0: move(target: 2, vehicle: 0), move(target: 3, vehicle: 0), move(target: 4, vehicle: 0), 
-P(1) = 8.1125 P(100.0)=118.24999999999999 P(10000.0)=11131.999999999998
+P(0.001)=7.0011125 P(1) = 8.1125 P(100.0)=118.24999999999999 P(10000.0)=11131.999999999998
 
 Graph: test-4x4
 Algorithm: rta-10
 Agent 0: move(target: 2, vehicle: 0), move(target: 3, vehicle: 0), move(target: 4, vehicle: 0), 
-P(1) = 8.1125 P(100.0)=118.24999999999999 P(10000.0)=11131.999999999998
+P(0.001)=7.0011125 P(1) = 8.1125 P(100.0)=118.24999999999999 P(10000.0)=11131.999999999998
 
 Graph: test-4x4
 Algorithm: a
 Agent 0: move(target: 2, vehicle: 0), move(target: 3, vehicle: 0), move(target: 4, vehicle: 0), 
-P(1) = 5.1125 P(100.0)=115.24999999999999 P(10000.0)=11128.999999999998
+P(0.001)=4.0011125 P(1) = 5.1125 P(100.0)=115.24999999999999 P(10000.0)=11128.999999999998

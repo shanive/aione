@@ -316,7 +316,7 @@ public class ATPenv {
 				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
 				double S = this.agents_scores.get(i).getTime(),
 					   T = agent.expandCount;
-				System.out.println("P(1) = "+(1.0*S+T)+" P(100.0)="+(100.0*S+T)+" P(10000.0)="+(10000.0*S+T));
+				System.out.println("P(0.001)="+(0.001*S+T)+" P(1) = "+(1.0*S+T)+" P(100.0)="+(100.0*S+T)+" P(10000.0)="+(10000.0*S+T));
 			}
 		}
 
