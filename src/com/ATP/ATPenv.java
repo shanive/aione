@@ -38,7 +38,8 @@ public class ATPenv {
 		System.exit(1);
 	}
 
-	private Agent createAgent(String name, int id, int initial, int goal){
+	private Agent createAgent(BufferedReader userInputReader,
+							  String name, int id, int initial, int goal){
 		try {
 			if (name.compareTo("human") == 0)
 				return new Human(id, initial, goal);
@@ -51,8 +52,6 @@ public class ATPenv {
 			else if (name.compareTo("A*") == 0)
 				return new AstarAgent(id, initial, goal);
 			else if (name.compareTo("RTA*") == 0){
-				BufferedReader userInputReader = new BufferedReader(
-						new InputStreamReader(System.in));
 				System.out.println("Enter RTA* max depth:");
 				int depth;
 				depth = Integer.parseInt(userInputReader.readLine());
@@ -123,9 +122,10 @@ public class ATPenv {
 				String[] inputs = userInputReader.readLine().split(" ");
 				if (inputs.length != 3) error();
 				agents_positions.addElement(Integer.parseInt(inputs[0]));
-				Agent agent = this.createAgent(inputs[2], i,
-									Integer.parseInt(inputs[0]),
-									Integer.parseInt(inputs[1]));
+				Agent agent = this.createAgent(userInputReader,
+											   inputs[2], i,
+											   Integer.parseInt(inputs[0]),
+											   Integer.parseInt(inputs[1]));
 				this.agents_list.add(agent);
 			}
 
