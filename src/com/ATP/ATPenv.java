@@ -74,10 +74,22 @@ public class ATPenv {
 			Vector<ATPedge> allEdges = new Vector<ATPedge>();
 			Vector<ATPvehicle> vehicles = new Vector<ATPvehicle>();
 			String line;
-			int maxV = 0; //to know what is the max Vertex number
-			int verticesNum = Integer.parseInt(br.readLine().split(" ")[1]);
-			this.state = new ATPstate(verticesNum);
+			int verticesNum = -1;
+			int maxV = -1;
 			int vehicleCount = 0;
+
+			while((line = br.readLine()) != null) {
+				String[] tokens = line.split(" ");
+				if(tokens[0].compareTo("#V") == 0) {
+					System.out.println("line="+line);
+					verticesNum = Integer.parseInt(tokens[1]);
+					break;
+				}
+			}
+			this.state = new ATPstate(verticesNum);
+			maxV = verticesNum;
+			
+			// parse list of edges and vehices, #V means vehicle now
 			while((line = br.readLine()) != null){
 				String[] Tokens = line.split(" ");
 				if (Tokens[0].compareTo("#E") == 0){
