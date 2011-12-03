@@ -294,19 +294,15 @@ public class ATPenv {
 				}
 			}
 		}
-		if (Debug.instance().isDebugOn()){
-			System.out.println("Agents' Moves:");
-			for(int i = 0; i < this.agents_list.size();i++){
-				System.out.print("Agent "+i+": ");
-				Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
-				while (moves.hasNext()){
-					System.out.print(moves.next()+", ");
-				}
-				System.out.println("");
-			}
-		}
+
+		System.out.println("Agents' Moves:");
 		for(int i = 0; i < this.agents_list.size();i++){
 			System.out.print("Agent "+i+": ");
+			Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
+			while (moves.hasNext()){
+				System.out.print(moves.next()+", ");
+			}
+			System.out.println("");
 			if (this.agents_list.get(i) instanceof SearchAgent){
 				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
 				double p = this.f*this.agents_scores.get(i).getTime() + agent.expandCount;
