@@ -60,7 +60,7 @@ public class Greedy extends Agent {
 		}
 		boolean isFlooded;
 		int car = state.agentVehicle(this.ID);
-		isFlooded = ATPgraph.instance().getEdge(this.position, this.path.get(0)).isFlooded();
+		isFlooded = ATPgraph.instance().getEdge(this.position, this.path.get(1)).isFlooded();
 		//search for new car only if the edge is flooded and our current car is incompatible
 		if (isFlooded )
 			if (((car!= -1) && (ATPgraph.instance().getVehicle(car).getEff() == 0))
