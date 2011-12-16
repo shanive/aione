@@ -80,7 +80,6 @@ public class ATPenv {
 			while((line = br.readLine()) != null) {
 				String[] tokens = line.split(" ");
 				if(tokens[0].compareTo("#V") == 0) {
-					System.out.println("line="+line);
 					verticesNum = Integer.parseInt(tokens[1]);
 					break;
 				}

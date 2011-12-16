@@ -6,7 +6,7 @@ Explenations of Heuristic Function used on part 2 of the assignment:
 
 Describtion:
 
-For every given state, our heuristic function returns the time 
+For every given state, our heuristic function returns the time it takes
 to pass the shortest path from the agent's cuurent possition to
 it's goal possition assuming all vehicles are accessible from 
 every vertex.
@@ -25,7 +25,7 @@ will need to choose between a fast regular vehicle and a slower amphibious
 vehicle, because later on he might need to traverse a flooded edge.
 
 We also wanted to choose an admissible heuristic so for A* and RTA* based agents.
-One way to make sure an heuristic function is admissible is to lower constraints.
+One way to make sure a heuristic function is admissible is to lower constraints.
 So we ignored the constraint that we might not have an compatible vehicle when 
 reaching a certain vertex.
 
@@ -45,8 +45,8 @@ cost(xi) = weight(ti-1,ti) / speed(vi)
 
 In our computation of h(n), we assume that in every edge (ti-1,ti), we can use
 the fastest compatible vehicle and we don't consider Tswitch (the time to switch 
-vehicle). So the actual cast of each action xi is not smaller then the cost we get
-if our computation. Meaning, for every 0<=i<=n, our_cost(xi) <= actual_cost(xi), 
+vehicle). So the actual cost of each action xi is not smaller then the cost we get
+in our computation. Meaning, for every 0<=i<=n, our_cost(xi) <= actual_cost(xi), 
 and we get: h(n) = our_cost(P) <= actual_cost(P) = h*(n).
  
 
