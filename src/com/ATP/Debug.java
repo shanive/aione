@@ -1,3 +1,4 @@
+
 package com.ATP;
 
 public class Debug {
@@ -21,3 +22,4 @@ public class Debug {
 		return this._debug;
 	}
 }
+

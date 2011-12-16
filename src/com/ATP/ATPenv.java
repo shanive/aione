@@ -13,15 +13,15 @@ import com.tree.SearchAgent;
 
 
 public class ATPenv {
-	final int f = 1;
 	Vector<Vector<ATPmove>> agents_moves;
 	Vector<Agent> agents_list;
 	Vector<AgentScore> agents_scores;
 	ATPstate state;
-	boolean m_batch;
 
-	public ATPenv(String file, boolean batch) {
-		m_batch = batch;
+	// configurable parameters, see main
+	static boolean batch = false, print_state = false;
+
+	public ATPenv(String file) {
 		initEnv(file);
 		this.agents_scores = new Vector<AgentScore>();
 		this.agents_moves = new Vector<Vector<ATPmove>>();
@@ -86,7 +86,7 @@ public class ATPenv {
 			}
 			this.state = new ATPstate(verticesNum);
 			maxV = verticesNum;
-			
+
 			// parse list of edges and vehices, #V means vehicle now
 			while((line = br.readLine()) != null){
 				String[] Tokens = line.split(" ");
@@ -252,7 +252,7 @@ public class ATPenv {
 				} else {
 					all_done = false;
 				}
-				agent.repeatedStates.add(this.state);
+				agent.repeatedStates.add(new ATPstate(this.state));
 				ATPmove move = agent.nextMove(this.state);
 				if (move != null){//no available move
 					if (Debug.instance().isDebugOn()){
@@ -264,6 +264,9 @@ public class ATPenv {
 					score.addStep();
 					score.addTime(price);
 					this.agents_moves.get(agent.getID()).add(move);
+				} else if(batch && this.agents_list.size()==1) {
+					gameover = true;
+					break;
 				}
 				else{//release the vehicle that the agent have
 					int vehicle = this.state.agentVehicle(agent.getID());
@@ -272,9 +275,15 @@ public class ATPenv {
 					}
 				}
 			}
-			this.state.printer();
+			if(print_state)
+				this.state.printer();
+			else {// still print the current node
+				for(int i = 0; i < this.agents_list.size(); i++){
+					System.out.println("Agent "+i+" position: "+ this.state.getAgentPosition(i));
+				}
+			}
 			this.printScores();
-			if(!m_batch) {
+			if(!batch) {
 				System.out.println("Continue Simulation? y/n");
 				while(true) {
 						try {
@@ -294,26 +303,23 @@ public class ATPenv {
 				}
 			}
 		}
-		if (Debug.instance().isDebugOn()){
-			System.out.println("Agents' Moves:");
-			for(int i = 0; i < this.agents_list.size();i++){
-				System.out.print("Agent "+i+": ");
-				Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
-				while (moves.hasNext()){
-					System.out.print(moves.next()+", ");
-				}
-				System.out.println("");
-			}
-		}
+
+		System.out.println("Agents' Moves:");
 		for(int i = 0; i < this.agents_list.size();i++){
 			System.out.print("Agent "+i+": ");
+			Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
+			while (moves.hasNext()){
+				System.out.print(moves.next()+", ");
+			}
+			System.out.println("");
 			if (this.agents_list.get(i) instanceof SearchAgent){
 				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
-				double p = this.f*this.agents_scores.get(i).getTime() + agent.expandCount;
-				System.out.println("P = "+p);
+				double S = this.agents_scores.get(i).getTime(),
+					   T = agent.expandCount;
+				System.out.println("P(0.001)="+(0.001*S+T)+" P(1) = "+(1.0*S+T)+" P(100.0)="+(100.0*S+T)+" P(10000.0)="+(10000.0*S+T));
 			}
 		}
-			
+
 		System.out.println("bye bye.");
 	}
 
@@ -333,18 +339,26 @@ public class ATPenv {
 	public String toString(){
 		return ATPgraph.instance().toString();
 	}
-	
+
 	public static void main(String[] args) {
 		if (args.length == 0){
-			System.out.println("Usage: <input-file> <debug>");
+			System.out.println("Usage: [-d|-b|-s <value>] <input-file>");
 			System.exit(1);
 		}
-		if ((args.length > 1) && (args[1].compareTo("true") == 0)){
-			Debug.initDebug(true);
-		}else{
-			Debug.initDebug(false);
+		boolean debug = false;
+		int iarg = 0;
+		while(iarg != args.length) {
+			if(args[iarg].compareTo("-d")==0) {
+				debug = true;
+			} else if(args[iarg].compareTo("-b")==0) {
+				batch = true;
+			} else if(args[iarg].compareTo("-s")==0) {
+				print_state = true;
+			} else break;
+			++iarg;
 		}
-		ATPenv env = new ATPenv(args[0], args.length==2);
+		Debug.initDebug(debug);
+		ATPenv env = new ATPenv(args[iarg]);
 		env.RunEnv();
 	}
 
