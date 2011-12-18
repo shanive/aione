@@ -14,7 +14,6 @@ import com.tree.SearchAgent;
 
 public class ATPenv {
 	Vector<Vector<ATPmove>> agents_moves;
-	Vector<Agent> agents_list;
 	Vector<AgentScore> agents_scores;
 	ATPstate state;
 	boolean horizon;
@@ -29,7 +28,7 @@ public class ATPenv {
 		initEnv(file);
 		this.agents_scores = new Vector<AgentScore>();
 		this.agents_moves = new Vector<Vector<ATPmove>>();
-		for (int i = 0; i < this.agents_list.size(); i++)
+		for (int i = 0; i < ATPgraph.instance().getAgentsNum(); i++)
 		{
 			this.agents_moves.add(new Vector<ATPmove>());
 			this.agents_scores.add(new AgentScore());
@@ -117,7 +116,7 @@ public class ATPenv {
 				}
 			}
 			this.state.initVehiclesOwners(vehicleCount);
-			
+
 			//read user input.
 			BufferedReader userInputReader = new BufferedReader(
 					new InputStreamReader(System.in));
@@ -128,8 +127,7 @@ public class ATPenv {
 				this.T = Integer.parseInt(userInputReader.readLine());
 			}
 
-			ATPgraph.initiate(filterEdges(allEdges, maxV), vehicles, tswitch);
-			this.agents_list = new Vector<Agent>();
+			Vector<Agent> agents_list = new Vector<Agent>();
 
 			System.out.println("Enter number of agents:");
 			int agentsNum = Integer.parseInt(userInputReader.readLine());
@@ -145,9 +143,9 @@ public class ATPenv {
 											   inputs[2], i,
 											   Integer.parseInt(inputs[0]),
 											   Integer.parseInt(inputs[1]));
-				this.agents_list.add(agent);
+				agents_list.add(agent);
 			}
-
+			ATPgraph.initiate(filterEdges(allEdges, maxV), vehicles, agents_list, tswitch);
 			this.state.setAgents(agents_state);
 
 			br.close();
@@ -243,10 +241,10 @@ public class ATPenv {
 		price += edge.getWeight() / speed;
 		return price;
 	}
-	
+
 	/*
 	 * run ply of given Agent.
-	 * return true if agent reached goal or got stuck.  
+	 * return true if agent reached goal or got stuck.
 	 */
 	private boolean runPly(Agent agent){
 		if (agent.reachedGoal()){
@@ -264,7 +262,7 @@ public class ATPenv {
 			score.addStep();
 			score.addTime(price);
 			this.agents_moves.get(agent.getID()).add(move);
-		} else if(batch && this.agents_list.size()==1) {
+		} else if(batch && ATPgraph.instance().getAgentsNum()==1) {
 			return true; //agent is stuck
 		}
 		else{//release the vehicle that the agent have
@@ -278,15 +276,15 @@ public class ATPenv {
 
 	private void printGameInfo(){
 		System.out.println("Agents' Moves:");
-		for(int i = 0; i < this.agents_list.size();i++){
+		for(int i = 0; i < ATPgraph.instance().getAgentsNum();i++){
 			System.out.print("Agent "+i+": ");
 			Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
 			while (moves.hasNext()){
 				System.out.print(moves.next()+", ");
 			}
 			System.out.println("");
-			if (this.agents_list.get(i) instanceof SearchAgent){
-				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
+			if (ATPgraph.instance().getAgentByID(i) instanceof SearchAgent){
+				SearchAgent agent = (SearchAgent)ATPgraph.instance().getAgentByID(i);
 				double S = this.agents_scores.get(i).getTime(),
 					   E = agent.expandCount;
 				System.out.println("P(0.001)="+(0.001*S+E)+" P(1) = "+(1.0*S+E)+
@@ -294,7 +292,7 @@ public class ATPenv {
 			}
 		}
 	}
-	
+
 	public void RunEnv()
 	{
 		BufferedReader reader = new BufferedReader(
@@ -304,7 +302,7 @@ public class ATPenv {
 		int movesPerAgent = 1;
 		while (!(gameover || all_done))
 		{
-			Iterator<Agent> it = this.agents_list.iterator();
+			Iterator<Agent> it = ATPgraph.instance().agentsIterator();
 			all_done = true;
 			while(it.hasNext()){
 				all_done = all_done && this.runPly(it.next());
@@ -312,7 +310,7 @@ public class ATPenv {
 			if(print_state)
 				this.state.printer();
 			else {// still print the current node
-				for(int i = 0; i < this.agents_list.size(); i++){
+				for(int i = 0; i < ATPgraph.instance().getAgentsNum(); i++){
 					System.out.println("Agent "+i+" position: "+ this.state.getAgentPosition(i));
 				}
 			}
@@ -341,12 +339,12 @@ public class ATPenv {
 			}
 			movesPerAgent++;
 		}
-		//add penalty if necessary 
-		for (int i = 0; i < this.agents_list.size(); i++){
-			if (!this.agents_list.get(i).reachedGoal())
+		//add penalty if necessary
+		for (int i = 0; i < ATPgraph.instance().getAgentsNum(); i++){
+			if (!ATPgraph.instance().getAgentByID(i).reachedGoal())
 				this.agents_scores.get(i).addTime(this.F);
 		}
-		
+
 		this.printGameInfo();
 		System.out.println("bye bye.");
 	}

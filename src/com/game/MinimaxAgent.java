@@ -9,20 +9,23 @@ import com.tree.SearchAgent;
 
 /**
  * @author Vered
- * Simulation of minimax agent 
+ * Simulation of minimax agent
  * This agent assumes his opponent tries to minimize his score.
  */
 public class MinimaxAgent extends SearchAgent{
-	
-	public MinimaxAgent(int id, int initial, int target, GameHeuristic func, int depth){
-		super(id, initial, target, func, depth);
+	private int opponentID;
+
+
+	public MinimaxAgent(int id, int initial, int target, GameHeuristic func, int cutoff, int opponent){
+		super(id, initial, target, func, cutoff);
+		this.opponentID = opponent;
 	}
 
 	@Override
 	public ATPmove nextMove(ATPstate state) {
 		return this.alphaBetaSearch(state);
 	}
-	
+
 	protected ATPmove alphaBetaSearch(ATPstate state){
 		double value = 0;
 		ATPmove move = null;
@@ -38,7 +41,7 @@ public class MinimaxAgent extends SearchAgent{
 		}
 		return move;
 	}
-	
+
 	protected double maxValue(Node current, double currAlpha, double currBeta){
 		if (this.terminalState(current.getState())){
 				return current.getHeuristicValue();
@@ -47,7 +50,7 @@ public class MinimaxAgent extends SearchAgent{
 		double value = Double.MIN_VALUE;
 		BinaryHeap<Node> queue = new BinaryHeap<Node>();
 		expand(current, queue);
-		
+
 		while (!queue.isEmpty()){
 			Node succ = queue.remove();
 			value = Math.max(value, this.minValue(succ, alpha, beta));
@@ -57,7 +60,7 @@ public class MinimaxAgent extends SearchAgent{
 		}
 		return value;
 	}
-	
+
 	protected double minValue(Node current, double currAlpha, double currBeta){
 		if (this.terminalState(current.getState())){
 				return current.getHeuristicValue();
@@ -66,7 +69,7 @@ public class MinimaxAgent extends SearchAgent{
 		double value = Double.MAX_VALUE;
 		BinaryHeap<Node> queue = new BinaryHeap<Node>();
 		expand(current, queue);
-		
+
 		while (!queue.isEmpty()){
 			Node succ = queue.remove();
 			value = Math.min(value, this.maxValue(succ, alpha, beta));
@@ -76,15 +79,10 @@ public class MinimaxAgent extends SearchAgent{
 		}
 		return value;
 	}
-	
+
 	protected boolean terminalState(ATPstate state){
 		return (state.getAgentPosition(this.ID) == this.goal);
 	}
 
-	@Override
-	public boolean reachedGoal() {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 }

@@ -5,6 +5,7 @@ import java.util.Vector;
 
 public class ATPgraph {
 	private Vector<ATPvehicle> vehicles;
+	private Vector<Agent> agents;
 	private double tswitch;
 	private int vertics;
 	private Vector<Vector<ATPedge>> graph; //there is a possibility for a vector to be empty.
@@ -12,24 +13,41 @@ public class ATPgraph {
 									//in the file then will be no empty vector.
 	private static ATPgraph _instance = null;
 
-	private ATPgraph(Vector<Vector<ATPedge>> a_graph, Vector<ATPvehicle> vehicleList, double timeToSwitch)
+	private ATPgraph(Vector<Vector<ATPedge>> a_graph, Vector<ATPvehicle> vehicleList,
+					Vector<Agent> agentList, double timeToSwitch)
 	{
 		this.vehicles = vehicleList;
+		this.agents = agentList;
 		this.tswitch = timeToSwitch;
 		this.graph = a_graph;
 		this.vertics = a_graph.size();
 	}
 
 
-	public static void initiate(Vector<Vector<ATPedge>> a_graph, Vector<ATPvehicle> vehicleList, double timeToSwitch)
+	public static void initiate(Vector<Vector<ATPedge>> a_graph, Vector<ATPvehicle> vehicleList,
+									Vector<Agent> agentsList, double timeToSwitch)
 	{
 		if(_instance == null)
-			_instance = new ATPgraph(a_graph, vehicleList, timeToSwitch);
+			_instance = new ATPgraph(a_graph, vehicleList, agentsList, timeToSwitch);
 	}
 
 	public double getTswitch()
 	{
 		return this.tswitch;
+	}
+
+	public int getAgentsNum(){
+		return this.agents.size();
+	}
+
+	public Agent getAgentByID(int id){
+		if (this.agents == null)
+			return null;
+		return this.agents.get(id);
+	}
+
+	public Iterator<Agent> agentsIterator(){
+		return this.agents.iterator();
 	}
 
 	public Iterator<ATPvehicle> vehiclesIter(){
