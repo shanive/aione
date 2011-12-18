@@ -4,7 +4,9 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class ATPstate {
-	/* agents_positions[i] = The number of vertex where the i agent is. */
+	/* highest vertex index */
+    int nv;
+	/* agents_positions[i] = The number of vertex where the i agent is. */ 
 	Vector<AgentState> agents_state;
 	/* vehicles_positions[i] = All The vehicles at vertex number i. */
 	Vector<Vector<ATPvehicle>> vehicles_positions;
@@ -12,6 +14,7 @@ public class ATPstate {
 	Vector<Integer> vehicle_owner;
 
 	public ATPstate(int n){
+		this.nv = n;
 		this.vehicles_positions = new Vector<Vector<ATPvehicle>>();
 		for(int i=0; i<=n; i++)
 		{
@@ -261,5 +264,62 @@ public class ATPstate {
 			}
 			System.out.println("");
 		}
+	}
+
+	public void htmlPrinterHeader(String htmlname) throws java.io.IOException {
+		java.io.PrintStream out = new java.io.PrintStream(new java.io.FileOutputStream(htmlname), false);
+
+		out.print("<html><head><title>game state</title>\n");
+		out.print("<style type=\"text/css\">\n");
+		out.print("table.state {border-collapse: collapse; }\n");
+		out.print("table.state tr.vertices { color: white; background-color: #333333;}\n");
+		out.print("table.state th, table.state td { border: thin solid black ; }\n");
+		out.print("table.state tr.vehicles { font-style: italic; color: #333333;}\n");
+		out.print("</style></head><body>\n\n");
+
+		out.close();
+	}
+
+    /**
+	 * prints state info to an html file
+	 */
+	public void htmlPrinter(String htmlname) throws java.io.IOException {
+		java.io.PrintStream out = new java.io.PrintStream(new java.io.FileOutputStream(htmlname, true));
+
+		out.print("<table class=\"state\">\n");
+		out.print("  <tr class=\"vertices\"><th>Vertices:</th>");
+		for(int iv = 1; iv <= nv; ++iv) {
+			out.print("<th>"+iv+"</th>");
+		}
+		out.print("</tr>\n");
+		for(int ia = 0; ia < this.agents_state.size(); ia++)
+		{
+			AgentState as = this.agents_state.elementAt(ia);
+			out.print("  <tr class=\"agent\"><td>Agent " + ia + "</td>");
+			for(int iv = 1; iv<=nv; ++iv) {
+				if(as.getAgentPosition()==iv)
+					out.print("<td>"+as.getAgentVehicleId()+"</td>");
+				else
+					out.print("<td>&nbsp;</td>");
+			}
+			out.print("</tr>\n");
+		}
+				
+		out.print("  <tr class=\"vehicles\"><td>Vehicles</td>");
+		for(int i = 1; i < this.vehicles_positions.size(); i++)
+		{
+			out.print("<td>");
+			Iterator<ATPvehicle> init = this.vehicles_positions.get(i).iterator();
+			while (init.hasNext())
+			{
+				ATPvehicle vehicle = init.next();
+				out.print(vehicle.getVehicleId()+" ");
+			}
+			out.print("</td>");
+		}
+		out.print("</tr>\n");
+		out.print("</table>\n");
+		out.print("<p/>");
+		out.close();
 	}
 }
