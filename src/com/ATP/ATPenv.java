@@ -22,6 +22,8 @@ public class ATPenv {
 	// configurable parameters, see main
 	static boolean batch = false, print_state = false;
 
+	static final String state_html = "state.html";
+
 	public ATPenv(String file) {
 		this.horizon = true; //get number of moves per agent from user
 		this.T = 0; // initial value of horizon
@@ -293,22 +295,27 @@ public class ATPenv {
 		}
 	}
 
-	public void RunEnv()
+	public void RunEnv() throws java.io.IOException 
 	{
 		BufferedReader reader = new BufferedReader(
 				new InputStreamReader(System.in));
 		boolean gameover = false;
 		boolean all_done = false;
 		int movesPerAgent = 1;
+
+		this.state.htmlPrinterHeader(state_html);
+		this.state.htmlPrinter(state_html);
 		while (!(gameover || all_done))
 		{
 			Iterator<Agent> it = ATPgraph.instance().agentsIterator();
 			all_done = true;
 			while(it.hasNext()){
 				all_done = all_done && this.runPly(it.next());
-			}
-			if(print_state)
+			}	
+			this.state.htmlPrinter(state_html);
+			if(print_state) {
 				this.state.printer();
+			}
 			else {// still print the current node
 				for(int i = 0; i < ATPgraph.instance().getAgentsNum(); i++){
 					System.out.println("Agent "+i+" position: "+ this.state.getAgentPosition(i));
@@ -366,7 +373,7 @@ public class ATPenv {
 		return ATPgraph.instance().toString();
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws java.io.IOException {
 		if (args.length == 0){
 			System.out.println("Usage: [-d|-b|-s <value>] <input-file>");
 			System.exit(1);
