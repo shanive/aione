@@ -29,12 +29,18 @@ public class AgentState {
 		return this.vehicle;
 	}
 
-	public void setAgentPosition(int pos){
+	protected void setAgentPosition(int pos){
 		this.position = pos;
 	}
 
-	public void setAgentVehicleId(int id){
+	protected void setAgentVehicleId(int id){
 		this.vehicle = id;
+	}
+
+	public void moveAgent(int posTarget, int vehTarget, double cost){
+		this.setAgentPosition(posTarget);
+		this.setAgentVehicleId(vehTarget);
+		this.pathCost += cost;
 	}
 
 	@Override
