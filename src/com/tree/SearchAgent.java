@@ -82,7 +82,7 @@ public class SearchAgent extends Agent {
 		return this.actions.remove(0);
 	}
 
-	private boolean repeated(ATPstate state){
+	protected boolean repeated(ATPstate state){
 		Iterator<ATPstate> it = this.repeatedStates.iterator();
 		while (it.hasNext()){
 			if (state.isEqual(it.next()))
@@ -91,7 +91,7 @@ public class SearchAgent extends Agent {
 		return false;
 	}
 
-	private Vector<ATPmove> availableMoves(ATPstate state)
+	protected Vector<ATPmove> availableMoves(ATPstate state)
 	{
 		int mypos = state.getAgentPosition(this.ID);
 		Vector<ATPmove> avails = new Vector<ATPmove>();
@@ -109,7 +109,7 @@ public class SearchAgent extends Agent {
 		return avails;
 	}
 
-	private void expand(Node node, BinaryHeap<Node> queue) {
+	protected void expand(Node node, BinaryHeap<Node> queue) {
 		ArrayList<Node> successors = new ArrayList<Node>();
 		this.expandCount += 1; 
 		//update heuristic
@@ -138,7 +138,7 @@ public class SearchAgent extends Agent {
 
 	//Assumption: move is legal in state.
 	//return move price
-	private double simulateMove(ATPstate state, ATPmove move)
+	protected double simulateMove(ATPstate state, ATPmove move)
 	{
 		double cost = 0.0;
 		double cost_switch = 0.0;
@@ -149,12 +149,12 @@ public class SearchAgent extends Agent {
 		int myVehId = state.agentVehicle(this.ID);
 		//release old vehicle
 		if ((myVehId != -1) && (myVehId != move.getVehicleID())){
-			state.setVehicleAvailable(myVehId);
+			state.setVehicleAvailable(myVehId, this.getID());
 		}
 		//switch
 		if (myVehId != move.getVehicleID()){
 			cost_switch += ATPgraph.instance().getTswitch();
-			state.setVehicleOwner(move.getVehicleID(), this.getID());//update vehicle's owner
+			state.setAgentVehicle(this.getID(), move.getVehicleID());//update vehicle's owner
 		}
 		//even if agent didn't change vehicle, the vehicle moves with agent
 		state.moveVeh(agent_pos, move.getTarget(), move.getVehicleID());//update vehicle's position

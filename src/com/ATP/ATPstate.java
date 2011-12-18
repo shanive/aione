@@ -5,7 +5,7 @@ import java.util.Vector;
 
 public class ATPstate {
 	/* agents_positions[i] = The number of vertex where the i agent is. */ 
-	Vector<Integer> agents_positions;
+	Vector<AgentState> agents_state;
 	/* vehicles_positions[i] = All The vehicles at vertex number i. */
 	Vector<Vector<ATPvehicle>> vehicles_positions;
 	/* vehicle_owner[i] = the ID of the agent who currently owns the i vehicle. */
@@ -20,7 +20,11 @@ public class ATPstate {
 	}
 	
 	public ATPstate(ATPstate state){
-		this.agents_positions = (Vector<Integer>) state.agents_positions.clone();
+		this.agents_state = new Vector<AgentState>();
+		Iterator<AgentState> st = state.agents_state.iterator();
+		while (st.hasNext()){
+			this.agents_state.add(new AgentState(st.next()));
+		}
 		this.vehicle_owner = (Vector<Integer>) state.vehicle_owner.clone();
 		this.vehicles_positions = new Vector<Vector<ATPvehicle>>();
 		Iterator<Vector<ATPvehicle>> it = state.vehicles_positions.iterator();
@@ -53,27 +57,36 @@ public class ATPstate {
 		this.addVehicle(to, veh);
 	}
 	
+	/**
+	 * 
+	 * @param agentId
+	 * @return the id of the agent's vehicle (-1 if has no vehicle)
+	 */
 	public int agentVehicle(int agentId)
 	{
-		for(int i = 0; i< this.vehicle_owner.size(); i++)
-		{
-			if (this.vehicle_owner.get(i) == agentId)
-				return i;
-		}
-		return -1;
+		return (this.agents_state.get(agentId).getAgentVehicleId());
 	}
 	
 	private void removeVehicle(int from, ATPvehicle veh){
 		this.vehicles_positions.get(from).remove(veh);
 	}
 	
-	public void setAgents(Vector<Integer> vec){
-		this.agents_positions = vec;
+	/**
+	 * initiate agents' state,
+	 * @param vec agents' states
+	 */
+	public void setAgents(Vector<AgentState> vec){
+		this.agents_state = vec;
 	}
 	
+	/**
+	 * set the position of agent with id agent_id to be pos.
+	 * @param agent_id
+	 * @param pos 
+	 */
 	public void setAgentPosition(int agent_id, int pos)
 	{
-		this.agents_positions.set(agent_id, pos);
+		this.agents_state.get(agent_id).setAgentPosition(pos);
 	}
 	
 	/**
@@ -82,7 +95,7 @@ public class ATPstate {
 	 */
 	public int getAgentPosition(int id)
 	{
-		return this.agents_positions.get(id);
+		return this.agents_state.get(id).getAgentPosition();
 	}
 	
 	/**
@@ -95,11 +108,23 @@ public class ATPstate {
 		return this.vehicles_positions.get(vertex).iterator();
 	}
 	
+	/**
+	 * 
+	 * @param vertex
+	 * @return vector of vehicles at a given vertex  
+	 */
 	public Vector<ATPvehicle> getVehiclesAt(int vertex)
 	{
 		return this.vehicles_positions.get(vertex);
 	}
 	
+	/**
+	 * 
+	 * @param vehicle
+	 * @param vertex
+	 * @return vehicle with a given id at a given vertex
+	 * @return null if no such vehicle at the given vertex.
+	 */
 	public ATPvehicle getVehicleAt(int vehicle, int vertex)
 	{
 		Iterator<ATPvehicle> it = this.iterateVehicleAt(vertex);
@@ -111,28 +136,55 @@ public class ATPstate {
 		return null;
 	}
 	
+	/**
+	 * 
+	 * @param vehID vehicle's id
+	 * @return id of agent owns this vehicle
+	 */
 	public int getVehicleOwner(int vehID)
 	{
 		return this.vehicle_owner.get(vehID);
 	}
 	
-	public void setVehicleOwner(int vehID, int agentID)
+	/**
+	 * set the vehicle id of the agent with a given id
+	 * @param agentID agent's is
+	 * @param vehID vehicle's id
+	 */
+	public void setAgentVehicle(int agentID, int vehID)
 	{
 		this.vehicle_owner.set(vehID, agentID);
+		this.agents_state.get(agentID).setAgentVehicleId(vehID);
 	}
 	
-	public void setVehicleAvailable(int vehID)
+	/**
+	 * sets the vehicle to be available
+	 * @param vehID vehicle id
+	 * @param currentOwner current owner of the vehicle
+	 */
+	public void setVehicleAvailable(int vehID, int currentOwner)
 	{
 		this.vehicle_owner.set(vehID, -1);
+		this.agents_state.get(currentOwner).setAgentVehicleId(-1); //agent releases vehicle
 	}
 	
+	/**
+	 * 
+	 * @param vehID vehicle id
+	 * @return true is vehicle available and false else.
+	 */
 	public boolean isVehicleAvailable(int vehID){
 		return (this.vehicle_owner.get(vehID) == -1);
 	}
 	
+	/**
+	 * 
+	 * @param state
+	 * @return true if this equals to a given state,
+	 */
 	public boolean isEqual(ATPstate state){
 		//check agents positions
-		if (!this.agents_positions.equals(state.agents_positions))
+		if (!this.agents_state.equals(state.agents_state))
 			return false;
 		if (!this.vehicle_owner.equals(state.vehicle_owner))
 			return false;
@@ -148,12 +200,17 @@ public class ATPstate {
 		return true;
 	}
 	
+	/**
+	 * prints state info.
+	 */
 	public void printer()
 	{
 		System.out.println("Current State:\nPlayers Positions:");
-		for(int i = 0; i < this.agents_positions.size(); i++)
+		for(int i = 0; i < this.agents_state.size(); i++)
 		{
-			System.out.println("Agent "+i+": vertex "+this.agents_positions.get(i)+", ");
+			AgentState temp = this.agents_state.elementAt(i);
+			System.out.println("Agent "+i+": vertex "+temp.getAgentPosition()+
+								", vehicle: "+temp.getAgentVehicleId());
 		}
 		System.out.println("Vehicles Positions:");
 		for(int i = 0; i < this.vehicles_positions.size(); i++)
@@ -164,11 +221,7 @@ public class ATPstate {
 			while (init.hasNext())
 			{
 				ATPvehicle vehicle = init.next();
-				String owner = "none";
-				if (this.vehicle_owner.get(vehicle.getVehicleId()) != -1)
-					owner = Integer.toString(this.vehicle_owner.get(vehicle.getVehicleId()));
-				System.out.print("Vehicle ID: "+vehicle.getVehicleId()+
-						", Owner ID: "+owner+", ");
+				System.out.print("Vehicle ID: "+vehicle.getVehicleId());
 			}
 			System.out.println("");
 		}

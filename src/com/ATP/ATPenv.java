@@ -17,11 +17,15 @@ public class ATPenv {
 	Vector<Agent> agents_list;
 	Vector<AgentScore> agents_scores;
 	ATPstate state;
-
+	boolean horizon;
+	int T;
+	final int F = 100; //penalty
 	// configurable parameters, see main
 	static boolean batch = false, print_state = false;
 
 	public ATPenv(String file) {
+		this.horizon = true; //get number of moves per agent from user
+		this.T = 0; // initial value of horizon
 		initEnv(file);
 		this.agents_scores = new Vector<AgentScore>();
 		this.agents_moves = new Vector<Vector<ATPmove>>();
@@ -113,25 +117,30 @@ public class ATPenv {
 				}
 			}
 			this.state.initVehiclesOwners(vehicleCount);
+			
+			//read user input.
 			BufferedReader userInputReader = new BufferedReader(
 					new InputStreamReader(System.in));
 			System.out.println("Enter Tswitch:");
 			double tswitch = Double.parseDouble(userInputReader.readLine());
-
+			if (this.horizon){
+				System.out.println("Enter horizon T (moves per agent):");
+				this.T = Integer.parseInt(userInputReader.readLine());
+			}
 
 			ATPgraph.initiate(filterEdges(allEdges, maxV), vehicles, tswitch);
 			this.agents_list = new Vector<Agent>();
 
 			System.out.println("Enter number of agents:");
 			int agentsNum = Integer.parseInt(userInputReader.readLine());
-			Vector<Integer> agents_positions = new Vector<Integer>();
+			Vector<AgentState> agents_state = new Vector<AgentState>();
 			System.out.println("For each agent enter: initial vertex, " +
-					"goal vertex and type(human/speed/greedy/greedy-search/a*)");
+					"goal vertex and type(human/speed/greedy/greedy-search/A*/RTA*)");
 			for (int i = 0; i < agentsNum ; i++)
 			{
 				String[] inputs = userInputReader.readLine().split(" ");
 				if (inputs.length != 3) error();
-				agents_positions.addElement(Integer.parseInt(inputs[0]));
+				agents_state.addElement(new AgentState(Integer.parseInt(inputs[0])));
 				Agent agent = this.createAgent(userInputReader,
 											   inputs[2], i,
 											   Integer.parseInt(inputs[0]),
@@ -139,7 +148,7 @@ public class ATPenv {
 				this.agents_list.add(agent);
 			}
 
-			this.state.setAgents(agents_positions);
+			this.state.setAgents(agents_state);
 
 			br.close();
 
@@ -216,12 +225,12 @@ public class ATPenv {
 		int currentVeh = this.state.agentVehicle(agent.getID());
 		//if agent switch vehicle, release the old one
 		if ((currentVeh != -1) && (currentVeh != vehicle.getVehicleId())){
-			this.state.setVehicleAvailable(currentVeh);
+			this.state.setVehicleAvailable(currentVeh, agent.getID());
 		}
 		//change vehicle if needed
 		if (currentVeh != vehicle.getVehicleId()){
 			price += ATPgraph.instance().getTswitch();
-			this.state.setVehicleOwner(vehicle.getVehicleId(), agent.getID());
+			this.state.setAgentVehicle(agent.getID(), vehicle.getVehicleId());
 		}
 		//even if agent didn't changed vehicle, it moves with him
 		this.state.moveVeh(agent_pos, move.getTarget(), move.getVehicleID());//update vehicle's position
@@ -234,46 +243,71 @@ public class ATPenv {
 		price += edge.getWeight() / speed;
 		return price;
 	}
+	
+	/*
+	 * run ply of given Agent.
+	 * return true if agent reached goal or got stuck.  
+	 */
+	private boolean runPly(Agent agent){
+		if (agent.reachedGoal()){
+			return true;
+		}
+		agent.repeatedStates.add(new ATPstate(this.state));
+		ATPmove move = agent.nextMove(this.state);
+		if (move != null){//no available move
+			if (Debug.instance().isDebugOn()){
+				System.out.println("Agent's move:"+move);
+			}
+			double price = this.executeMove(agent, move);
+			//update agent's score
+			AgentScore score = this.agents_scores.get(agent.getID());
+			score.addStep();
+			score.addTime(price);
+			this.agents_moves.get(agent.getID()).add(move);
+		} else if(batch && this.agents_list.size()==1) {
+			return true; //agent is stuck
+		}
+		else{//release the vehicle that the agent have
+			int vehicle = this.state.agentVehicle(agent.getID());
+			if (vehicle != -1){
+				this.state.setVehicleAvailable(vehicle, agent.getID());
+			}
+		}
+		return false;
+	}
 
+	private void printGameInfo(){
+		System.out.println("Agents' Moves:");
+		for(int i = 0; i < this.agents_list.size();i++){
+			System.out.print("Agent "+i+": ");
+			Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
+			while (moves.hasNext()){
+				System.out.print(moves.next()+", ");
+			}
+			System.out.println("");
+			if (this.agents_list.get(i) instanceof SearchAgent){
+				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
+				double S = this.agents_scores.get(i).getTime(),
+					   E = agent.expandCount;
+				System.out.println("P(0.001)="+(0.001*S+E)+" P(1) = "+(1.0*S+E)+
+						" P(100.0)="+(100.0*S+E)+" P(10000.0)="+(10000.0*S+E));
+			}
+		}
+	}
+	
 	public void RunEnv()
 	{
 		BufferedReader reader = new BufferedReader(
 				new InputStreamReader(System.in));
 		boolean gameover = false;
 		boolean all_done = false;
+		int movesPerAgent = 1;
 		while (!(gameover || all_done))
 		{
 			Iterator<Agent> it = this.agents_list.iterator();
 			all_done = true;
 			while(it.hasNext()){
-				Agent agent = it.next();
-				if (agent.reachedGoal()){
-					continue;
-				} else {
-					all_done = false;
-				}
-				agent.repeatedStates.add(new ATPstate(this.state));
-				ATPmove move = agent.nextMove(this.state);
-				if (move != null){//no available move
-					if (Debug.instance().isDebugOn()){
-						System.out.println("Agent's move:"+move);
-					}
-					double price = this.executeMove(agent, move);
-					//update agent's score
-					AgentScore score = this.agents_scores.get(agent.getID());
-					score.addStep();
-					score.addTime(price);
-					this.agents_moves.get(agent.getID()).add(move);
-				} else if(batch && this.agents_list.size()==1) {
-					gameover = true;
-					break;
-				}
-				else{//release the vehicle that the agent have
-					int vehicle = this.state.agentVehicle(agent.getID());
-					if (vehicle != -1){
-						this.state.setVehicleAvailable(vehicle);
-					}
-				}
+				all_done = all_done && this.runPly(it.next());
 			}
 			if(print_state)
 				this.state.printer();
@@ -283,7 +317,7 @@ public class ATPenv {
 				}
 			}
 			this.printScores();
-			if(!batch) {
+			if(!this.horizon && !batch) {
 				System.out.println("Continue Simulation? y/n");
 				while(true) {
 						try {
@@ -302,24 +336,18 @@ public class ATPenv {
 						}
 				}
 			}
-		}
-
-		System.out.println("Agents' Moves:");
-		for(int i = 0; i < this.agents_list.size();i++){
-			System.out.print("Agent "+i+": ");
-			Iterator<ATPmove> moves = this.agents_moves.get(i).iterator();
-			while (moves.hasNext()){
-				System.out.print(moves.next()+", ");
+			if (this.horizon && (movesPerAgent == this.T)){
+				gameover = true;
 			}
-			System.out.println("");
-			if (this.agents_list.get(i) instanceof SearchAgent){
-				SearchAgent agent = (SearchAgent)this.agents_list.get(i);
-				double S = this.agents_scores.get(i).getTime(),
-					   T = agent.expandCount;
-				System.out.println("P(0.001)="+(0.001*S+T)+" P(1) = "+(1.0*S+T)+" P(100.0)="+(100.0*S+T)+" P(10000.0)="+(10000.0*S+T));
-			}
+			movesPerAgent++;
 		}
-
+		//add penalty if necessary 
+		for (int i = 0; i < this.agents_list.size(); i++){
+			if (!this.agents_list.get(i).reachedGoal())
+				this.agents_scores.get(i).addTime(this.F);
+		}
+		
+		this.printGameInfo();
 		System.out.println("bye bye.");
 	}
 
