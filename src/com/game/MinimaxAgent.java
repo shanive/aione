@@ -29,11 +29,11 @@ public class MinimaxAgent extends SearchAgent{
 	protected ATPmove alphaBetaSearch(ATPstate state){
 		double value = 0;
 		ATPmove move = null;
-		Node current = new Node(state, null, null, 0.0, 0.0, null);
+		GameNode current = new GameNode(state, null, null, 0.0, 0.0, null);
 		value = this.maxValue(current, Double.MIN_VALUE, Double.MAX_VALUE);
 		Iterator<Node> it = current.getSuccessors().iterator();
 		while (it.hasNext()){
-			Node succ = it.next();
+			GameNode succ = (GameNode)it.next();
 			if (succ.getHeuristicValue() == value){
 				move = succ.getAction();
 				break;
@@ -63,7 +63,7 @@ public class MinimaxAgent extends SearchAgent{
 
 	protected double minValue(Node current, double currAlpha, double currBeta){
 		if (this.terminalState(current.getState())){
-				return current.getHeuristicValue();
+				return this.result(current.getState());
 		}
 		double alpha = currAlpha , beta = currBeta;
 		double value = Double.MAX_VALUE;
@@ -78,6 +78,10 @@ public class MinimaxAgent extends SearchAgent{
 			beta = Math.min(beta, value);
 		}
 		return value;
+	}
+
+	protected double result(ATPstate state){
+		return (state.getAgentScore(this.ID) - state.getAgentScore(this.opponentID));
 	}
 
 	protected boolean terminalState(ATPstate state){
