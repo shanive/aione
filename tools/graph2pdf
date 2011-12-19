@@ -1,0 +1,3 @@
+#!/bin/sh
+
+python `dirname $0`/graph2dot.py < $1 | dot -Tpdf > `echo $1| sed 's/\.txt/.pdf/'`

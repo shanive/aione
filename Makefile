@@ -1,5 +1,5 @@
 all:
-	javac -cp bin -sourcepath src -d bin `find src -name '*.java'`
+	javac -cp bin -d bin -sourcepath src  `find src -name '*.java'`
 
 clean:
 	find . -name '*.class' | xargs rm
