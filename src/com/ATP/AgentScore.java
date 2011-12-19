@@ -1,4 +1,4 @@
-package com.ATP;
+package src.com.ATP;
 
 public class AgentScore {
 	int steps;

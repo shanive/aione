@@ -54,7 +54,7 @@ public class ATPstate {
 		this.vehicles_positions.get(to).add(veh);
 	}
 
-	public void moveVeh(int from, int to, int id){
+	protected void moveVeh(int from, int to, int id){
 		ATPvehicle veh = this.getVehicleAt(id, from);
 		this.removeVehicle(from, veh);
 		this.addVehicle(to, veh);
@@ -70,7 +70,7 @@ public class ATPstate {
 		return (this.agents_state.get(agentId).getAgentVehicleId());
 	}
 
-	private void removeVehicle(int from, ATPvehicle veh){
+	protected void removeVehicle(int from, ATPvehicle veh){
 		this.vehicles_positions.get(from).remove(veh);
 	}
 
@@ -84,26 +84,32 @@ public class ATPstate {
 	 * @return move cost
 	 */
 	public void moveAgent(int id, ATPmove move, double cost){
-		double price = 0.0;
+		double cost = 0.0;
 
 		ATPedge edge = ATPgraph.instance().getEdge(this.getAgentPosition(id), move.getTarget());
-		ATPvehicle vehicle = ATPgraph.
+		ATPvehicle vehicle = ATPgraph.instance().getVehicle(move.getVehicleID());
+
+		//calculate time to travers the edge
+		if (edge.isFlooded())
+		    cost = edge.getWeight() / vehicle.speedFlooded();
+		else
+		    cost = edge.getWeight() / vehicle.speedUnflooded();
 
 		int currentVeh = this.agentVehicle(id);
 		//if agent switch vehicle, release the old one
 		if ((currentVeh != -1) && (currentVeh != move.getVehicleID())){
 			this.setVehicleAvailable(currentVeh, id);
 		}
-		//change vehicle if needed
+		//get into new vehicle
 		if (currentVeh != move.getVehicleID()){
-			price += ATPgraph.instance().getTswitch();
+			cost += ATPgraph.instance().getTswitch();
 			this.setAgentVehicle(id, move.getVehicleID());
 		}
 		//vehicle moves with agent
 		this.moveVeh(this.getAgentPosition(id), move.getTarget(), move.getVehicleID());//update vehicle's position
-		this.setAgentVehicle(id, move.getVehicleID());//update vehicle's owner
-
-		this.agents_state.get(id).moveAgent(move.getTarget(), move.getVehicleID(), price);//update agent's state
+		this.setAgentVehicle(id, move.getVehicleID());//set vehicle's owner
+		//update agent's state
+		this.agents_state.get(id).moveAgent(move.getTarget(), move.getVehicleID(), cost);
 		//update agent's inner state
 		Agent agent = ATPgraph.instance().getAgentByID(id);
 		agent.setPosition(move.getTarget());
@@ -111,19 +117,11 @@ public class ATPstate {
 	}
 
 	/**
-	 * initiate agents' state,
-	 * @param vec agents' states
-	 */
-	public void setAgents(Vector<AgentState> vec){
-		this.agents_state = vec;
-	}
-
-	/**
 	 * set the position of agent with id agent_id to be pos.
 	 * @param agent_id
 	 * @param pos
 	 */
-	public void setAgentPosition(int agent_id, int pos)
+	protected void setAgentPosition(int agent_id, int pos)
 	{
 		this.agents_state.get(agent_id).setAgentPosition(pos);
 	}
@@ -190,10 +188,9 @@ public class ATPstate {
 	 * @param agentID agent's is
 	 * @param vehID vehicle's id
 	 */
-	public void setAgentVehicle(int agentID, int vehID)
+	protected void setAgentVehicle(int agentID, int vehID)
 	{
 		this.vehicle_owner.set(vehID, agentID);
-		this.agents_state.get(agentID).setAgentVehicleId(vehID);
 	}
 
 	/**
