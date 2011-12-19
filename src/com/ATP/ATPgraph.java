@@ -13,11 +13,10 @@ public class ATPgraph {
 									//in the file then will be no empty vector.
 	private static ATPgraph _instance = null;
 
-	private ATPgraph(Vector<Vector<ATPedge>> a_graph, Vector<ATPvehicle> vehicleList,
-					Vector<Agent> agentList, double timeToSwitch)
+	private ATPgraph(Vector<Vector<ATPedge>> a_graph, Vector<ATPvehicle> vehicleList, 
+			double timeToSwitch)
 	{
 		this.vehicles = vehicleList;
-		this.agents = agentList;
 		this.tswitch = timeToSwitch;
 		this.graph = a_graph;
 		this.vertics = a_graph.size();
@@ -25,10 +24,14 @@ public class ATPgraph {
 
 
 	public static void initiate(Vector<Vector<ATPedge>> a_graph, Vector<ATPvehicle> vehicleList,
-									Vector<Agent> agentsList, double timeToSwitch)
+								 double timeToSwitch)
 	{
 		if(_instance == null)
-			_instance = new ATPgraph(a_graph, vehicleList, agentsList, timeToSwitch);
+			_instance = new ATPgraph(a_graph, vehicleList, timeToSwitch);
+	}
+
+	public void setAgents(Vector<Agent> agentsList){
+		this.agents = agentsList;
 	}
 
 	public double getTswitch()

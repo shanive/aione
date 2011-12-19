@@ -65,7 +65,7 @@ public class SearchAgent extends Agent {
 			if (Debug.instance().isDebugOn()){
 				System.out.println("entering state with node="+node.getState().getAgentPosition(this.ID)+" into repeated states");
 			}
-				if (iteration == this.depth || this.goalTest(node.getState())){
+			if (iteration == this.depth || this.goalTest(node.getState())){
 				return this.firstAction(node); //backtracking
 			}
 			this.expand(node, queue);
@@ -111,7 +111,7 @@ public class SearchAgent extends Agent {
 
 	protected void expand(Node node, BinaryHeap<Node> queue) {
 		ArrayList<Node> successors = new ArrayList<Node>();
-		this.expandCount += 1; 
+		this.expandCount += 1;
 		//update heuristic
 		Vector<ATPmove> availableMoves = this.availableMoves(node.getState());
 		//start expanding
@@ -120,62 +120,23 @@ public class SearchAgent extends Agent {
 			ATPmove move = availableMoves.remove(0);
 			ATPstate state = new ATPstate(node.getState());
 			double h_value = this.h.evaluate(state, move);
-			double price = this.simulateMove(state , move) + node.getPathCost();
+			state.agentMove(this, move); //move is legal
 			if (Debug.instance().isDebugOn()){
-				System.out.println("target="+move.getTarget()+" price="+price+" h_value="+h_value);
+				System.out.println("target="+move.getTarget()+
+						" price="+state.getAgentScore(this.ID)+" h_value="+h_value);
 			}
 			if (!this.repeated(state)){
-				Node child = new Node(state, move, node, price, h_value, this.comparator);
+				Node child = new Node(state, move, node, state.getAgentScore(this.ID), h_value, this.comparator);
 				successors.add(0, child);
 				queue.add(child);
 			} else if (Debug.instance().isDebugOn()){
-				
+
 				System.out.println("repeated state on move to "+move.getTarget());
 			}
 		}
 		node.setSuccessors(successors);
 	}
 
-	//Assumption: move is legal in state.
-	//return move price
-	protected double simulateMove(ATPstate state, ATPmove move)
-	{
-		double cost = 0.0;
-		double cost_switch = 0.0;
-		double cost_move = 0.0;
-		int agent_pos = state.getAgentPosition(this.getID());
-		ATPedge edge = ATPgraph.instance().getEdge(agent_pos, move.getTarget());
-		ATPvehicle vehicle = state.getVehicleAt(move.getVehicleID(), agent_pos);
-		int myVehId = state.agentVehicle(this.ID);
-		//release old vehicle
-		if ((myVehId != -1) && (myVehId != move.getVehicleID())){
-			state.setVehicleAvailable(myVehId, this.getID());
-		}
-		//switch
-		if (myVehId != move.getVehicleID()){
-			cost_switch += ATPgraph.instance().getTswitch();
-			state.setAgentVehicle(this.getID(), move.getVehicleID());//update vehicle's owner
-		}
-		//even if agent didn't change vehicle, the vehicle moves with agent
-		state.moveVeh(agent_pos, move.getTarget(), move.getVehicleID());//update vehicle's position
-		state.setAgentPosition(this.getID(), move.getTarget());//update agent's position on state
-
-		double speed = 0.0;
-		if (edge.isFlooded())
-			speed = vehicle.speedFlooded();
-		else
-			speed = vehicle.speedUnflooded();
-
-		cost_move += ((double)edge.getWeight() / speed);
-
-		cost = cost_switch + cost_move;
-		
-		if (Debug.instance().isDebugOn()){
-			System.out.println("target="+move.getTarget()+
-				" edge_weight(raw)="+edge.getWeight()+" speed_flooded="+vehicle.speedFlooded()+" cost="+cost+" cost_switch="+cost_switch+" cost_move="+cost_move);
-		}
-		return cost;
-	}
 
 	private boolean goalTest(ATPstate state){
 		return (state.getAgentPosition(this.ID)==this.goal);

@@ -1,4 +1,4 @@
-package src.com.ATP;
+package com.ATP;
 public class ATPvehicle {
 	int vehicleID;
 	int agentID;

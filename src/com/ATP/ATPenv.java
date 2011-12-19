@@ -14,7 +14,6 @@ import com.tree.SearchAgent;
 
 public class ATPenv {
 	Vector<Vector<ATPmove>> agents_moves;
-	Vector<AgentScore> agents_scores;
 	ATPstate state;
 	boolean horizon;
 	int T;
@@ -28,12 +27,10 @@ public class ATPenv {
 		this.horizon = true; //get number of moves per agent from user
 		this.T = 0; // initial value of horizon
 		initEnv(file);
-		this.agents_scores = new Vector<AgentScore>();
 		this.agents_moves = new Vector<Vector<ATPmove>>();
 		for (int i = 0; i < ATPgraph.instance().getAgentsNum(); i++)
 		{
 			this.agents_moves.add(new Vector<ATPmove>());
-			this.agents_scores.add(new AgentScore());
 		}
 	}
 
@@ -128,6 +125,7 @@ public class ATPenv {
 				System.out.println("Enter horizon T (moves per agent):");
 				this.T = Integer.parseInt(userInputReader.readLine());
 			}
+			ATPgraph.initiate(filterEdges(allEdges, maxV), vehicles, tswitch);
 
 			Vector<Agent> agents_list = new Vector<Agent>();
 
@@ -147,9 +145,8 @@ public class ATPenv {
 											   Integer.parseInt(inputs[1]));
 				agents_list.add(agent);
 			}
-			ATPgraph.initiate(filterEdges(allEdges, maxV), vehicles, agents_list, tswitch);
 			this.state.setAgents(agents_state);
-
+			ATPgraph.instance().setAgents(agents_list);
 			br.close();
 
 		} catch (FileNotFoundException e) {
@@ -184,66 +181,6 @@ public class ATPenv {
 		return res;
 	}
 
-
-	//return price
-	private double executeMove(Agent agent, ATPmove move)
-	{
-		//default large values to discorage illegal moves
-		double weight = 1000;
-		double vel = 1.0;
-		int vehID = move.getVehicleID();
-		int agent_pos = this.state.getAgentPosition(agent.getID());
-		ATPvehicle vehicle = this.state.getVehicleAt(move.getVehicleID(), agent_pos);
-		if (vehicle == null){
-			System.err.println("No Such Vehicle");
-			System.out.println("Agent Get Default Price");
-			return weight / vel;
-		}
-		vel = vehicle.getVel();
-		if (!this.state.isVehicleAvailable(vehID) && (this.state.getVehicleOwner(vehID)!=agent.getID())){
-			System.err.println("Unavailable Vehicle");
-			System.out.println("Agent Get Default Price");
-			return weight / vel;
-		}
-		ATPedge edge = ATPgraph.instance().getEdge(agent_pos, move.getTarget());
-		if (edge ==  null){
-			System.err.println("No Such Edge");
-			System.out.println("Agent Get Default Price");
-			return weight / vel;
-		}
-		weight = edge.getWeight();
-		if (edge.isFlooded() && (vehicle.getEff() == 0)){
-			System.out.println("Incompatible Vehicle");
-			return (weight / vel);
-		}
-		double price = 0.0;
-		double speed = 0.0;
-		if (edge.isFlooded())
-			speed = vehicle.speedFlooded();
-		else
-			speed = vehicle.speedUnflooded();
-		int currentVeh = this.state.agentVehicle(agent.getID());
-		//if agent switch vehicle, release the old one
-		if ((currentVeh != -1) && (currentVeh != vehicle.getVehicleId())){
-			this.state.setVehicleAvailable(currentVeh, agent.getID());
-		}
-		//change vehicle if needed
-		if (currentVeh != vehicle.getVehicleId()){
-			price += ATPgraph.instance().getTswitch();
-			this.state.setAgentVehicle(agent.getID(), vehicle.getVehicleId());
-		}
-		//even if agent didn't changed vehicle, it moves with him
-		this.state.moveVeh(agent_pos, move.getTarget(), move.getVehicleID());//update vehicle's position
-		vehicle.setAgent(agent.getID());//update vehicle's owner//TODO redundant?
-
-		this.state.setAgentPosition(agent.getID(), move.getTarget());//update agent's position on state
-		//update agent's inner state
-		agent.setPosition(move.getTarget());
-		agent.setVehicleID(move.getVehicleID());//TODO redundant?
-		price += edge.getWeight() / speed;
-		return price;
-	}
-
 	/*
 	 * run ply of given Agent.
 	 * return true if agent reached goal or got stuck.
@@ -258,11 +195,8 @@ public class ATPenv {
 			if (Debug.instance().isDebugOn()){
 				System.out.println("Agent's move:"+move);
 			}
-			double price = this.executeMove(agent, move);
+			boolean legalMove = this.state.agentMove(agent, move);
 			//update agent's score
-			AgentScore score = this.agents_scores.get(agent.getID());
-			score.addStep();
-			score.addTime(price);
 			this.agents_moves.get(agent.getID()).add(move);
 		} else if(batch && ATPgraph.instance().getAgentsNum()==1) {
 			return true; //agent is stuck
@@ -287,7 +221,7 @@ public class ATPenv {
 			System.out.println("");
 			if (ATPgraph.instance().getAgentByID(i) instanceof SearchAgent){
 				SearchAgent agent = (SearchAgent)ATPgraph.instance().getAgentByID(i);
-				double S = this.agents_scores.get(i).getTime(),
+				double S = this.state.getAgentScore(i),
 					   E = agent.expandCount;
 				System.out.println("P(0.001)="+(0.001*S+E)+" P(1) = "+(1.0*S+E)+
 						" P(100.0)="+(100.0*S+E)+" P(10000.0)="+(10000.0*S+E));
@@ -295,7 +229,7 @@ public class ATPenv {
 		}
 	}
 
-	public void RunEnv() throws java.io.IOException 
+	public void RunEnv() throws java.io.IOException
 	{
 		BufferedReader reader = new BufferedReader(
 				new InputStreamReader(System.in));
@@ -311,7 +245,7 @@ public class ATPenv {
 			all_done = true;
 			while(it.hasNext()){
 				all_done = all_done && this.runPly(it.next());
-			}	
+			}
 			this.state.htmlPrinter(state_html);
 			if(print_state) {
 				this.state.printer();
@@ -349,7 +283,7 @@ public class ATPenv {
 		//add penalty if necessary
 		for (int i = 0; i < ATPgraph.instance().getAgentsNum(); i++){
 			if (!ATPgraph.instance().getAgentByID(i).reachedGoal())
-				this.agents_scores.get(i).addTime(this.F);
+				this.state.agentPenalty(i, this.F);
 		}
 
 		this.printGameInfo();
@@ -357,14 +291,11 @@ public class ATPenv {
 	}
 
 	private void printScores(){
-		Iterator<AgentScore> it = this.agents_scores.iterator();
 		System.out.println("Agents' Scores:");
-		int agent = 0;
-		while (it.hasNext())
+		for (int agent = 0; agent < ATPgraph.instance().getAgentsNum(); agent++)
 		{
-			AgentScore score = it.next();
-			System.out.println("Agent "+agent+": steps: "+score.getSteps()+
-					", time: "+ score.getTime());
+			System.out.println("Agent "+agent+": steps: "+this.state.getAgentStepsNum(agent)+
+					", time: "+ this.state.getAgentScore(agent));
 			agent++;
 		}
 	}

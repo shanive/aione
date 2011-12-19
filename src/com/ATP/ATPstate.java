@@ -6,7 +6,7 @@ import java.util.Vector;
 public class ATPstate {
 	/* highest vertex index */
     int nv;
-	/* agents_positions[i] = The number of vertex where the i agent is. */ 
+	/* agents_positions[i] = The number of vertex where the i agent is. */
 	Vector<AgentState> agents_state;
 	/* vehicles_positions[i] = All The vehicles at vertex number i. */
 	Vector<Vector<ATPvehicle>> vehicles_positions;
@@ -54,6 +54,10 @@ public class ATPstate {
 		this.vehicles_positions.get(to).add(veh);
 	}
 
+	public void setAgents(Vector<AgentState> agents){
+		this.agents_state = agents;
+	}
+
 	protected void moveVeh(int from, int to, int id){
 		ATPvehicle veh = this.getVehicleAt(id, from);
 		this.removeVehicle(from, veh);
@@ -76,54 +80,70 @@ public class ATPstate {
 
 	/**
 	 * make agent's move
-	 * @pre move is legal
 	 * @param id Agent's id
 	 * @param target Vertex to move to
 	 * @param vehicle Agent's vehicle
 	 * @param cost Cost of move
-	 * @return move cost
+	 * @return true if move is legal and false otherwise
 	 */
-	public void moveAgent(int id, ATPmove move, double cost){
-		double cost = 0.0;
+	public boolean agentMove(Agent agent, ATPmove move){
 
-		ATPedge edge = ATPgraph.instance().getEdge(this.getAgentPosition(id), move.getTarget());
 		ATPvehicle vehicle = ATPgraph.instance().getVehicle(move.getVehicleID());
 
+		//check if move is legal, if not- return false
+		if (vehicle == null){
+			System.err.println("No Such Vehicle");
+			System.out.println("Agent Get Default Price");
+			return false;
+		}
+
+		if (!this.isVehicleAvailable(move.getVehicleID()) &&
+				(this.getVehicleOwner(move.getVehicleID())!= agent.getID())){
+			System.err.println("Unavailable Vehicle");
+			System.out.println("Agent Get Default Price");
+			return false;
+		}
+		ATPedge edge = ATPgraph.instance().getEdge(this.getAgentPosition(
+				agent.getID()), move.getTarget());
+
+		if (edge ==  null){
+			System.err.println("No Such Edge");
+			System.out.println("Agent Get Default Price");
+			return false;
+		}
+
+		if (edge.isFlooded() && (vehicle.getEff() == 0)){
+			System.out.println("Incompatible Vehicle");
+			return false;
+		}
+		//move is legal- compute time (cost) and change the state.
+		double time = 0.0;
 		//calculate time to travers the edge
 		if (edge.isFlooded())
-		    cost = edge.getWeight() / vehicle.speedFlooded();
+			time += (edge.getWeight() / vehicle.speedFlooded());
 		else
-		    cost = edge.getWeight() / vehicle.speedUnflooded();
+			time += (edge.getWeight() / vehicle.speedUnflooded());
 
-		int currentVeh = this.agentVehicle(id);
+		int currentVeh = this.agentVehicle(agent.getID());
 		//if agent switch vehicle, release the old one
 		if ((currentVeh != -1) && (currentVeh != move.getVehicleID())){
-			this.setVehicleAvailable(currentVeh, id);
+			this.setVehicleAvailable(currentVeh, agent.getID());
 		}
 		//get into new vehicle
 		if (currentVeh != move.getVehicleID()){
-			cost += ATPgraph.instance().getTswitch();
-			this.setAgentVehicle(id, move.getVehicleID());
+			time += ATPgraph.instance().getTswitch();
+			this.setVehicleOwner(agent.getID(), move.getVehicleID());
 		}
 		//vehicle moves with agent
-		this.moveVeh(this.getAgentPosition(id), move.getTarget(), move.getVehicleID());//update vehicle's position
-		this.setAgentVehicle(id, move.getVehicleID());//set vehicle's owner
+		this.moveVeh(this.getAgentPosition(agent.getID()), move.getTarget(), move.getVehicleID());//update vehicle's position
 		//update agent's state
-		this.agents_state.get(id).moveAgent(move.getTarget(), move.getVehicleID(), cost);
+		this.agents_state.get(agent.getID()).moveAgent(move.getTarget(), move.getVehicleID(), time);
 		//update agent's inner state
-		Agent agent = ATPgraph.instance().getAgentByID(id);
+
 		agent.setPosition(move.getTarget());
 		agent.setVehicleID(move.getVehicleID());
-	}
 
-	/**
-	 * set the position of agent with id agent_id to be pos.
-	 * @param agent_id
-	 * @param pos
-	 */
-	protected void setAgentPosition(int agent_id, int pos)
-	{
-		this.agents_state.get(agent_id).setAgentPosition(pos);
+		return true;
 	}
 
 	/**
@@ -133,6 +153,19 @@ public class ATPstate {
 	public int getAgentPosition(int id)
 	{
 		return this.agents_state.get(id).getAgentPosition();
+	}
+
+
+	public double getAgentScore(int id){
+		return this.agents_state.get(id).getAgentScore();
+	}
+
+	public int getAgentStepsNum(int id){
+		return this.agents_state.get(id).getAgentStepsNum();
+	}
+
+	public void agentPenalty(int id, double time){
+		this.agents_state.get(id).addTime(time);
 	}
 
 	/**
@@ -188,7 +221,7 @@ public class ATPstate {
 	 * @param agentID agent's is
 	 * @param vehID vehicle's id
 	 */
-	protected void setAgentVehicle(int agentID, int vehID)
+	protected void setVehicleOwner(int agentID, int vehID)
 	{
 		this.vehicle_owner.set(vehID, agentID);
 	}
@@ -198,7 +231,7 @@ public class ATPstate {
 	 * @param vehID vehicle id
 	 * @param currentOwner current owner of the vehicle
 	 */
-	public void setVehicleAvailable(int vehID, int currentOwner)
+	protected void setVehicleAvailable(int vehID, int currentOwner)
 	{
 		this.vehicle_owner.set(vehID, -1);
 		this.agents_state.get(currentOwner).setAgentVehicleId(-1); //agent releases vehicle
@@ -211,6 +244,11 @@ public class ATPstate {
 	 */
 	public boolean isVehicleAvailable(int vehID){
 		return (this.vehicle_owner.get(vehID) == -1);
+	}
+
+
+	public Iterator<AgentState> agentsStateIterate(){
+		return this.agents_state.iterator();
 	}
 
 	/**
@@ -301,7 +339,7 @@ public class ATPstate {
 			}
 			out.print("</tr>\n");
 		}
-				
+
 		out.print("  <tr class=\"vehicles\"><td>Vehicles</td>");
 		for(int i = 1; i < this.vehicles_positions.size(); i++)
 		{

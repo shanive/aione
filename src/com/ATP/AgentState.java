@@ -9,16 +9,20 @@ public class AgentState {
 	private int position;
 	private int vehicle;
     private double pathCost;
+    private int stepsNum;
 
 	public AgentState(int initial){
 		this.position = initial; //initial state
 		this.vehicle = -1; //has no vehicle at the beginning
         this.pathCost  = 0.0;
+        this.stepsNum = 0;
 	}
 
 	public AgentState(AgentState other){
 		this.position = other.getAgentPosition();
 		this.vehicle = other.getAgentVehicleId();
+		this.pathCost = other.getAgentScore();
+		this.stepsNum = other.getAgentStepsNum();
 	}
 
 	public int getAgentPosition(){
@@ -27,6 +31,18 @@ public class AgentState {
 
 	public int getAgentVehicleId(){
 		return this.vehicle;
+	}
+
+	public double getAgentScore(){
+		return this.pathCost;
+	}
+
+	public int getAgentStepsNum(){
+		return this.stepsNum;
+	}
+
+	public void addTime(double time){
+		this.pathCost += time;
 	}
 
 	protected void setAgentPosition(int pos){
@@ -41,6 +57,7 @@ public class AgentState {
 		this.setAgentPosition(posTarget);
 		this.setAgentVehicleId(vehTarget);
 		this.pathCost += cost;
+		this.stepsNum += 1;
 	}
 
 	@Override
@@ -48,6 +65,8 @@ public class AgentState {
 		int hash = 7;
 		hash = 31 * hash + this.position;
 		hash = 31 * hash + this.vehicle;
+		hash = 31 * hash + this.stepsNum;
+		hash = 31 * hash + (int)this.pathCost;
 		return hash;
 	}
 
