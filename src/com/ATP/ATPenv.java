@@ -138,7 +138,7 @@ public class ATPenv {
 			Vector<AgentState> agents_state = new Vector<AgentState>();
 			int agentid = 0;
 			boolean game = false;
-			System.out.println("Play Game? (yes/no )");
+			System.out.println("Play Game? (yes/no)");
 			String answer = "";
 			while (true){
 				answer = userInputReader.readLine();
