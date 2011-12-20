@@ -4,6 +4,7 @@ import java.util.Iterator;
 import com.ATP.ATPmove;
 import com.ATP.ATPstate;
 import com.ATP.BinaryHeap;
+import com.tree.GreedyHeuristic;
 import com.tree.Node;
 import com.tree.SearchAgent;
 
@@ -15,9 +16,8 @@ import com.tree.SearchAgent;
 public class MinimaxAgent extends SearchAgent{
 	private int opponentID;
 
-
-	public MinimaxAgent(int id, int initial, int target, GameHeuristic func, int cutoff, int opponent){
-		super(id, initial, target, func, cutoff);
+	public MinimaxAgent(int id, int initial, int target, int opponent, int cutoff){
+		super(id, initial, target, new GreedyHeuristic(id, target), cutoff);
 		this.opponentID = opponent;
 	}
 
@@ -26,22 +26,32 @@ public class MinimaxAgent extends SearchAgent{
 		return this.alphaBetaSearch(state);
 	}
 
+	/**
+	 * performs an alpha beta search from a given state.
+	 * @param state the current state of the game
+	 * @return the best next move
+	 */
 	protected ATPmove alphaBetaSearch(ATPstate state){
 		double value = 0;
 		ATPmove move = null;
-		GameNode current = new GameNode(state, null, null, 0.0, 0.0, null);
+		Node current = new Node(state, null, null, 0.0, 0.0, null);
 		value = this.maxValue(current, Double.MIN_VALUE, Double.MAX_VALUE);
 		Iterator<Node> it = current.getSuccessors().iterator();
 		while (it.hasNext()){
-			GameNode succ = (GameNode)it.next();
-			if (succ.getHeuristicValue() == value){
+			Node succ = (GameNode)it.next();
+			if (succ.getOptimalCost() == value){
 				move = succ.getAction();
 				break;
 			}
 		}
 		return move;
 	}
-
+	/**
+	 * @param current Current state of the game
+	 * @param currAlpha current known minimal value this agent can get
+	 * @param currBeta current known maximal value this agent can get
+	 * @return maximal value this agent can get from a given state.
+	 */
 	protected double maxValue(Node current, double currAlpha, double currBeta){
 		if (this.terminalState(current.getState())){
 				return current.getHeuristicValue();
@@ -54,13 +64,19 @@ public class MinimaxAgent extends SearchAgent{
 		while (!queue.isEmpty()){
 			Node succ = queue.remove();
 			value = Math.max(value, this.minValue(succ, alpha, beta));
+			current.setOptimalCost(value);
 			if (value >= beta)
 				return value;
 			alpha = Math.max(alpha, value);
 		}
 		return value;
 	}
-
+	/**
+	 * @param current Current state of the game
+	 * @param currAlpha current known minimal value this agent can get
+	 * @param currBeta current known maximal value this agent can get
+	 * @return minimal value this agent can get from a given state.
+	 */
 	protected double minValue(Node current, double currAlpha, double currBeta){
 		if (this.terminalState(current.getState())){
 				return this.result(current.getState());
@@ -73,6 +89,7 @@ public class MinimaxAgent extends SearchAgent{
 		while (!queue.isEmpty()){
 			Node succ = queue.remove();
 			value = Math.min(value, this.maxValue(succ, alpha, beta));
+			current.setOptimalCost(value);
 			if (value <= alpha)
 				return value;
 			beta = Math.min(beta, value);

@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.Vector;
+
+import com.game.GameHeuristic;
+import com.game.MinimaxAgent;
 import com.tree.AstarAgent;
 import com.tree.GreedySearch;
 import com.tree.RTAstar;
@@ -129,12 +132,53 @@ public class ATPenv {
 
 			Vector<Agent> agents_list = new Vector<Agent>();
 
+
 			System.out.println("Enter number of agents:");
 			int agentsNum = Integer.parseInt(userInputReader.readLine());
 			Vector<AgentState> agents_state = new Vector<AgentState>();
+			int agentid = 0;
+			boolean game = false;
+			System.out.println("Play Game? (yes/no)");
+			String answer = "";
+			while (true){
+				answer = userInputReader.readLine();
+				if (answer.compareTo("yes") == 0){
+					game = true;
+					break;
+				}
+				else if (answer.compareTo("no") == 0)
+					break;
+				else
+					System.out.println("Enter yes/no:");
+
+			}
+			if (game){
+				System.out.println("Enter: <game-type> (zero-sum/non-zero-sum/cooperative)"+
+						"<cutoff> <initial-1> <goal-1> <initial-2> <goal-2>");
+				String[] gameInfo = userInputReader.readLine().split(" ");
+				agentid = 2;
+				int cutoff = Integer.parseInt(gameInfo[1]);
+				int initial1 = Integer.parseInt(gameInfo[2]);
+				int goal1 = Integer.parseInt(gameInfo[3]);
+				int initial2 = Integer.parseInt(gameInfo[4]);
+				int goal2 = Integer.parseInt(gameInfo[5]);
+				if (gameInfo[0].compareTo("zero-sum")==0){
+					MinimaxAgent firstagent = new MinimaxAgent(0, initial1, goal1,
+																	1, cutoff);
+					MinimaxAgent secondagent = new MinimaxAgent(1, initial2, goal2,
+																	0, cutoff);
+					agents_list.add(firstagent);
+					agents_state.add(new AgentState(initial1));
+					agents_list.add(secondagent);
+					agents_state.add(new AgentState(initial2));
+				}
+
+			}
+
+
 			System.out.println("For each agent enter: initial vertex, " +
 					"goal vertex and type(human/speed/greedy/greedy-search/A*/RTA*)");
-			for (int i = 0; i < agentsNum ; i++)
+			for (int i = agentid; i < agentsNum ; i++)
 			{
 				String[] inputs = userInputReader.readLine().split(" ");
 				if (inputs.length != 3) error();
