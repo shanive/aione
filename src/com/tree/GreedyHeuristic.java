@@ -88,6 +88,9 @@ public class GreedyHeuristic implements HeuristicFunction{
 		}
 	}
 
+	public double getShortestDistance(int vertex){
+		return this.m_dijkstra.getShortestDistance(City.valueOf(vertex));
+	}
 	@Override
 	public double evaluate(ATPstate state, ATPmove move) {
 		//compute h(state.getAgentPosition(this.m_agentID))

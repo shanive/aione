@@ -18,6 +18,7 @@ public interface HeuristicFunction {
 	 * @return the evaluation score
 	 */
 	public double evaluate(ATPstate state, ATPmove move);
+	
 
 	public void initHeuristic();
 

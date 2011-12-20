@@ -17,10 +17,10 @@ import com.ATP.*;
  *
  */
 public class SearchAgent extends Agent {
-	HeuristicFunction h;
-	LinkedList<ATPmove> actions = null;
-	Comparator<Node> comparator;
-	int depth;
+	protected HeuristicFunction h;
+	protected LinkedList<ATPmove> actions = null;
+	protected Comparator<Node> comparator;
+	protected int depth;
 	public int expandCount;
 
 	public SearchAgent(int id, int initial, int target,

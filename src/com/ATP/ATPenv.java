@@ -164,9 +164,9 @@ public class ATPenv {
 				int goal2 = Integer.parseInt(gameInfo[5]);
 				if (gameInfo[0].compareTo("zero-sum")==0){
 					MinimaxAgent firstagent = new MinimaxAgent(0, initial1, goal1,
-																	1, cutoff);
+																	1, goal2, cutoff);
 					MinimaxAgent secondagent = new MinimaxAgent(1, initial2, goal2,
-																	0, cutoff);
+																	0, goal1, cutoff);
 					agents_list.add(firstagent);
 					agents_state.add(new AgentState(initial1));
 					agents_list.add(secondagent);

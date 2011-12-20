@@ -1,5 +1,7 @@
 package com.ATP;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -51,7 +53,15 @@ public class ATPstate {
 	}
 
 	public void addVehicle(int to, ATPvehicle veh){
-		this.vehicles_positions.get(to).add(veh);
+		Vector<ATPvehicle> vehicles = this.vehicles_positions.get(to);
+		vehicles.add(veh);
+		//sort vehicles by id. each vehicle has a different id.
+		//sort for comparing states.
+		Collections.sort(vehicles, new Comparator<ATPvehicle>(){
+										public int compare(ATPvehicle o1, ATPvehicle o2){
+											return (o1.getVehicleId() - o2.getVehicleId());
+										}
+		});
 	}
 
 	public void setAgents(Vector<AgentState> agents){
