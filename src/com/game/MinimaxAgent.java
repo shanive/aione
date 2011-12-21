@@ -60,22 +60,26 @@ public class MinimaxAgent extends SearchAgent{
 	 * @return maximal value this agent can get from a given state.
 	 */
 	protected double maxValue(Node current, double currAlpha, double currBeta){
+		double value = 0.0;
 		if (this.terminalState(current.getState())){
-				return current.getHeuristicValue();
-		}else if (current.getDepth() == this.depth){
-			return this.EVAL(current);
+				value = this.result(current.getState());
 		}
-		double alpha = currAlpha , beta = currBeta;
-		double value = Double.MIN_VALUE;
-		BinaryHeap<Node> queue = new BinaryHeap<Node>();
-		expand(current, queue);
-
-		while (!queue.isEmpty()){
-			Node succ = queue.remove();
-			value = Math.max(value, this.minValue(succ, alpha, beta));
-			if (value >= beta)
-				return value;
-			alpha = Math.max(alpha, value);
+		else if (current.getDepth() == this.depth){
+				value = this.EVAL(current);
+		}
+		else{
+			double alpha = currAlpha , beta = currBeta;
+			BinaryHeap<Node> queue = new BinaryHeap<Node>();
+			value = Double.MIN_VALUE;
+			expand(current, queue);
+	
+			while (!queue.isEmpty()){
+				Node succ = queue.remove();
+				value = Math.max(value, this.minValue(succ, alpha, beta));
+				if (value >= beta)
+					break;
+				alpha = Math.max(alpha, value);
+			}
 		}
 		current.setOptimalCost(value);
 		return value;
@@ -87,22 +91,26 @@ public class MinimaxAgent extends SearchAgent{
 	 * @return minimal value this agent can get from a given state.
 	 */
 	protected double minValue(Node current, double currAlpha, double currBeta){
+		double value = 0.0;
 		if (this.terminalState(current.getState())){
-				return this.result(current.getState());
-		}else if (current.getDepth() == this.depth){
-			return this.EVAL(current);
+				value = this.result(current.getState());
 		}
-		double alpha = currAlpha , beta = currBeta;
-		double value = Double.MAX_VALUE;
-		BinaryHeap<Node> queue = new BinaryHeap<Node>();
-		expand(current, queue);
-
-		while (!queue.isEmpty()){
-			Node succ = queue.remove();
-			value = Math.min(value, this.maxValue(succ, alpha, beta));
-			if (value <= alpha)
-				return value;
-			beta = Math.min(beta, value);
+		else if (current.getDepth() == this.depth){
+				value = this.EVAL(current);
+		}
+		else{
+			double alpha = currAlpha , beta = currBeta;
+			BinaryHeap<Node> queue = new BinaryHeap<Node>();
+			value = Double.MAX_VALUE;
+			expand(current, queue);
+	
+			while (!queue.isEmpty()){
+				Node succ = queue.remove();
+				value = Math.min(value, this.maxValue(succ, alpha, beta));
+				if (value <= alpha)
+					break;
+				beta = Math.min(beta, value);
+			}
 		}
 		current.setOptimalCost(value);
 		return value;

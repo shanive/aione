@@ -176,10 +176,10 @@ public class ATPenv {
 			}
 
 
-			System.out.println("For each agent enter: initial vertex, " +
-					"goal vertex and type(human/speed/greedy/greedy-search/A*/RTA*)");
 			for (int i = agentid; i < agentsNum ; i++)
 			{
+				System.out.println("Enter: initial vertex, " +
+				"goal vertex and type(human/speed/greedy/greedy-search/A*/RTA*)");
 				String[] inputs = userInputReader.readLine().split(" ");
 				if (inputs.length != 3) error();
 				agents_state.addElement(new AgentState(Integer.parseInt(inputs[0])));
@@ -288,7 +288,8 @@ public class ATPenv {
 			Iterator<Agent> it = ATPgraph.instance().agentsIterator();
 			all_done = true;
 			while(it.hasNext()){
-				all_done = all_done && this.runPly(it.next());
+				Agent agent = it.next();
+				all_done = all_done & this.runPly(agent); // must be & so every agent will play
 			}
 			this.state.htmlPrinter(state_html);
 			if(print_state) {
