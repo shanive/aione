@@ -54,14 +54,17 @@ public class MinimaxAgent extends SearchAgent{
 		}
 		return move;
 	}
+
 	/**
 	 * @param current Current state of the game
 	 * @param currAlpha current known minimal value this agent can get
 	 * @param currBeta current known maximal value this agent can get
 	 * @return maximal value this agent can get from a given state.
 	 */
-	protected double maxValue(Node current, double currAlpha, double currBeta){
+	private double boundValue(Node current, double currAlpha, double currBeta) {
 		double value = 0.0;
+		//if depth is even then it's my turn. else, it's my opponent turn
+		boolean isOpponent = current.getDepth() % 2 != 0;
 		if (this.terminalState(current.getState())){
 				value = this.result(current.getState());
 		}
@@ -71,30 +74,50 @@ public class MinimaxAgent extends SearchAgent{
 		else{
 			double alpha = currAlpha , beta = currBeta;
 			BinaryHeap<Node> queue = new BinaryHeap<Node>();
-			value = Double.MIN_VALUE;
 			Agent agent = null;
 			HeuristicFunction hf = null;
-			//if depth is even then it's my turn. else, it's my opponent turn
-			if (current.getDepth() % 2 != 0){
+			if (isOpponent) {
+				value = Double.MAX_VALUE;
 				agent = ATPgraph.instance().getAgentByID(this.opponentID);
 				hf = this.opponentHeuristic;
 			}
 			else{
+				value = Double.MIN_VALUE;
 				agent = this;
 				hf = this.h;
 			}
 			current.expand(agent, hf, queue);
 	
-			while (!queue.isEmpty()){
-				Node succ = queue.remove();
-				value = Math.max(value, this.minValue(succ, alpha, beta));
-				if (value >= beta)
-					break;
-				alpha = Math.max(alpha, value);
+			if(isOpponent) {	
+				while (!queue.isEmpty()){
+					Node succ = queue.remove();
+					value = Math.min(value, this.maxValue(succ, alpha, beta));
+					if (value <= alpha)
+						break;
+					beta = Math.min(beta, value);
+				}
+			} else {
+				while (!queue.isEmpty()){
+					Node succ = queue.remove();
+					value = Math.max(value, this.minValue(succ, alpha, beta));
+					if (value >= beta)
+						break;
+					alpha = Math.max(alpha, value);
+				}
 			}
 		}
 		current.setOptimalCost(value);
 		return value;
+	}
+
+	/**
+	 * @param current Current state of the game
+	 * @param currAlpha current known minimal value this agent can get
+	 * @param currBeta current known maximal value this agent can get
+	 * @return maximal value this agent can get from a given state.
+	 */
+	protected double maxValue(Node current, double currAlpha, double currBeta){
+		return boundValue(current, currAlpha, currBeta);
 	}
 	/**
 	 * @param current Current state of the game
@@ -103,40 +126,7 @@ public class MinimaxAgent extends SearchAgent{
 	 * @return minimal value this agent can get from a given state.
 	 */
 	protected double minValue(Node current, double currAlpha, double currBeta){
-		double value = 0.0;
-		if (this.terminalState(current.getState())){
-				value = this.result(current.getState());
-		}
-		else if (current.getDepth() == this.depth){
-				value = this.EVAL(current);
-		}
-		else{
-			double alpha = currAlpha , beta = currBeta;
-			BinaryHeap<Node> queue = new BinaryHeap<Node>();
-			value = Double.MAX_VALUE;
-			Agent agent = null;
-			HeuristicFunction hf = null;
-			//if depth is even then it's the opponent turn. else, it's my turn
-			if (current.getDepth() % 2 != 0){
-				agent = ATPgraph.instance().getAgentByID(this.opponentID);
-				hf = this.opponentHeuristic;
-			}
-			else{
-				agent = this;
-				hf = this.h;
-			}
-			current.expand(agent, hf, queue);
-	
-			while (!queue.isEmpty()){
-				Node succ = queue.remove();
-				value = Math.min(value, this.maxValue(succ, alpha, beta));
-				if (value <= alpha)
-					break;
-				beta = Math.min(beta, value);
-			}
-		}
-		current.setOptimalCost(value);
-		return value;
+		return boundValue(current, currAlpha, currBeta);
 	}
 
 	protected double result(ATPstate state){
