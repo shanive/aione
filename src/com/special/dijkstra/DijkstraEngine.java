@@ -152,7 +152,7 @@ public class DijkstraEngine
         // extract the node with the shortest distance
         while ((u = unsettledNodes.poll()) != null)
         {
-            assert !isSettled(u);
+            // assert !isSettled(u);
             unsettledNodes.remove(u);
 
             // destination reached, stop

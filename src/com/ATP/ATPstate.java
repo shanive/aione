@@ -110,6 +110,8 @@ public class ATPstate {
 					avails.add(new ATPmove(edge.getTarget(), vehicle.getVehicleId()));
 			}
 		}
+		// should stay-in-place be added
+		// avails.add(new ATPmove(pos, this.agentVehicle(agentid)));
 		return avails;
 	}
 
