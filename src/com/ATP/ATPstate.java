@@ -87,6 +87,31 @@ public class ATPstate {
 	protected void removeVehicle(int from, ATPvehicle veh){
 		this.vehicles_positions.get(from).remove(veh);
 	}
+	
+	/**
+	 * 
+	 * @param agentid Agent's ID
+	 * @return vector of available moves of the agent with a given id
+	 */
+	public Vector<ATPmove> availableMovesOf(int agentid)
+	{
+		int pos = this.getAgentPosition(agentid);
+		Vector<ATPmove> avails = new Vector<ATPmove>();
+		Iterator<ATPedge> it = ATPgraph.instance().neighboursOfIterate(pos);
+		while(it.hasNext()){
+			ATPedge edge = it.next();
+			Iterator<ATPvehicle> ve = this.iterateVehicleAt(pos);
+			while (ve.hasNext()){
+				ATPvehicle vehicle = ve.next();
+				int vehid = vehicle.getVehicleId();
+				boolean available = (this.isVehicleAvailable(vehid) || 
+										(this.vehicle_owner.get(vehid) == agentid));
+				if (available && ((!edge.isFlooded()) || (edge.isFlooded() && (vehicle.getEff() > 0))))
+					avails.add(new ATPmove(edge.getTarget(), vehicle.getVehicleId()));
+			}
+		}
+		return avails;
+	}
 
 	/**
 	 * make agent's move
@@ -103,14 +128,12 @@ public class ATPstate {
 		//check if move is legal, if not- return false
 		if (vehicle == null){
 			System.err.println("No Such Vehicle");
-			System.out.println("Agent Get Default Price");
 			return false;
 		}
 
 		if (!this.isVehicleAvailable(move.getVehicleID()) &&
 				(this.getVehicleOwner(move.getVehicleID())!= agent.getID())){
 			System.err.println("Unavailable Vehicle");
-			System.out.println("Agent Get Default Price");
 			return false;
 		}
 		ATPedge edge = ATPgraph.instance().getEdge(this.getAgentPosition(
@@ -118,7 +141,6 @@ public class ATPstate {
 
 		if (edge ==  null){
 			System.err.println("No Such Edge");
-			System.out.println("Agent Get Default Price");
 			return false;
 		}
 
@@ -149,9 +171,6 @@ public class ATPstate {
 		//update agent's state
 		this.agents_state.get(agent.getID()).moveAgent(move.getTarget(), move.getVehicleID(), time);
 		//update agent's inner state
-
-		agent.setPosition(move.getTarget());
-		agent.setVehicleID(move.getVehicleID());
 
 		return true;
 	}

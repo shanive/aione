@@ -242,6 +242,8 @@ public class ATPenv {
 			boolean legalMove = this.state.agentMove(agent, move);
 			//update agent's score
 			this.agents_moves.get(agent.getID()).add(move);
+			agent.setPosition(move.getTarget());
+			agent.setVehicleID(move.getVehicleID());
 		} else if(batch && ATPgraph.instance().getAgentsNum()==1) {
 			return true; //agent is stuck
 		}

@@ -1,10 +1,7 @@
 package com.tree;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Vector;
 
 import com.ATP.*;
 
@@ -68,7 +65,8 @@ public class SearchAgent extends Agent {
 			if (iteration == this.depth || this.goalTest(node.getState())){
 				return this.firstAction(node); //backtracking
 			}
-			this.expand(node, queue);
+			this.expandCount++;
+			node.expand(this, this.h, queue);
 			iteration += 1;
 		}
 	}
@@ -80,61 +78,6 @@ public class SearchAgent extends Agent {
 			node = node.getParent();
 		}
 		return this.actions.remove(0);
-	}
-
-	protected boolean repeated(ATPstate state){
-		Iterator<ATPstate> it = this.repeatedStates.iterator();
-		while (it.hasNext()){
-			if (state.isEqual(it.next()))
-				return true;
-		}
-		return false;
-	}
-
-	protected Vector<ATPmove> availableMoves(ATPstate state)
-	{
-		int mypos = state.getAgentPosition(this.ID);
-		Vector<ATPmove> avails = new Vector<ATPmove>();
-		Iterator<ATPedge> it = ATPgraph.instance().neighboursOfIterate(
-												mypos);
-		while(it.hasNext()){
-			ATPedge edge = it.next();
-			Iterator<ATPvehicle> ve = state.iterateVehicleAt(mypos);
-			while (ve.hasNext()){
-				ATPvehicle vehicle = ve.next();
-				if ((!edge.isFlooded()) || (edge.isFlooded() && (vehicle.getEff() > 0)))
-					avails.add(new ATPmove(edge.getTarget(), vehicle.getVehicleId()));
-			}
-		}
-		return avails;
-	}
-
-	protected void expand(Node node, BinaryHeap<Node> queue) {
-		ArrayList<Node> successors = new ArrayList<Node>();
-		this.expandCount += 1;
-		//update heuristic
-		Vector<ATPmove> availableMoves = this.availableMoves(node.getState());
-		//start expanding
-		while (!availableMoves.isEmpty())
-		{
-			ATPmove move = availableMoves.remove(0);
-			ATPstate state = new ATPstate(node.getState());
-			double h_value = this.h.evaluate(state, move);
-			state.agentMove(this, move); //move is legal
-			if (Debug.instance().isDebugOn()){
-				System.out.println("target="+move.getTarget()+
-						" price="+state.getAgentScore(this.ID)+" h_value="+h_value);
-			}
-			if (!this.repeated(state)){
-				Node child = new Node(state, move, node, state.getAgentScore(this.ID), h_value, this.comparator);
-				successors.add(0, child);
-				queue.add(child);
-			} else if (Debug.instance().isDebugOn()){
-
-				System.out.println("repeated state on move to "+move.getTarget());
-			}
-		}
-		node.setSuccessors(successors);
 	}
 
 

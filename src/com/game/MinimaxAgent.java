@@ -5,6 +5,7 @@ import java.util.Iterator;
 import com.ATP.ATPgraph;
 import com.ATP.ATPmove;
 import com.ATP.ATPstate;
+import com.ATP.Agent;
 import com.ATP.BinaryHeap;
 import com.tree.GreedyHeuristic;
 import com.tree.HeuristicFunction;
@@ -39,7 +40,7 @@ public class MinimaxAgent extends SearchAgent{
 	protected ATPmove alphaBetaSearch(ATPstate state){
 		double value = 0;
 		ATPmove move = null;
-		Node current = new Node(state, null, null, 0.0, 0.0, null);
+		Node current = new Node(state, null, null, 0.0, 0.0, this.comparator);
 		
 		value = this.maxValue(current, Double.MIN_VALUE, Double.MAX_VALUE);
 		
@@ -71,7 +72,18 @@ public class MinimaxAgent extends SearchAgent{
 			double alpha = currAlpha , beta = currBeta;
 			BinaryHeap<Node> queue = new BinaryHeap<Node>();
 			value = Double.MIN_VALUE;
-			expand(current, queue);
+			Agent agent = null;
+			HeuristicFunction hf = null;
+			//if depth is even then it's my turn. else, it's my opponent turn
+			if (current.getDepth() % 2 != 0){
+				agent = ATPgraph.instance().getAgentByID(this.opponentID);
+				hf = this.opponentHeuristic;
+			}
+			else{
+				agent = this;
+				hf = this.h;
+			}
+			current.expand(agent, hf, queue);
 	
 			while (!queue.isEmpty()){
 				Node succ = queue.remove();
@@ -102,7 +114,18 @@ public class MinimaxAgent extends SearchAgent{
 			double alpha = currAlpha , beta = currBeta;
 			BinaryHeap<Node> queue = new BinaryHeap<Node>();
 			value = Double.MAX_VALUE;
-			expand(current, queue);
+			Agent agent = null;
+			HeuristicFunction hf = null;
+			//if depth is even then it's the opponent turn. else, it's my turn
+			if (current.getDepth() % 2 != 0){
+				agent = ATPgraph.instance().getAgentByID(this.opponentID);
+				hf = this.opponentHeuristic;
+			}
+			else{
+				agent = this;
+				hf = this.h;
+			}
+			current.expand(agent, hf, queue);
 	
 			while (!queue.isEmpty()){
 				Node succ = queue.remove();

@@ -1,5 +1,6 @@
 package com.ATP;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public abstract class Agent {
@@ -12,34 +13,43 @@ public abstract class Agent {
 	public LinkedList<ATPstate> repeatedStates = new LinkedList<ATPstate>();
 
 
-	protected int getID()
+	public int getID()
 	{
 		return this.ID;
 	}
 
-	protected int getPosition(){
+	public int getPosition(){
 		return this.position;
 	}
 
-	protected int getVehicleID()
+	public int getVehicleID()
 	{
 		return this.vehicleId;
 	}
 
-	protected boolean hasVehicle()
+	public boolean hasVehicle()
 	{
 		return (this.vehicleId != -1);
 	}
 
-	protected abstract ATPmove nextMove(ATPstate state);
+	public abstract ATPmove nextMove(ATPstate state);
 
-	protected abstract boolean reachedGoal();
+	public abstract boolean reachedGoal();
 
-	protected void setPosition(int i){
+	public void setPosition(int i){
 		this.position = i;
 	}
 
-	protected void setVehicleID(int id){
+	public void setVehicleID(int id){
 		this.vehicleId = id;
+	}
+	
+	public boolean isRepeatedState(ATPstate state){
+		Iterator<ATPstate> it = this.repeatedStates.iterator();
+		while (it.hasNext()){
+			if (state.isEqual(it.next()))
+				return true;
+		}
+		return false;
 	}
 }

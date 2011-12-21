@@ -2,9 +2,13 @@ package com.tree;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Vector;
 
 import com.ATP.ATPmove;
 import com.ATP.ATPstate;
+import com.ATP.Agent;
+import com.ATP.BinaryHeap;
+import com.ATP.Debug;
 
 public class Node implements Comparable<Node> {
 	ATPstate state;
@@ -128,5 +132,39 @@ public class Node implements Comparable<Node> {
 	@Override
 	public int compareTo(Node o) {
 		return this.comparator.compare(this, o);
+	}
+	
+	/**
+	 * expand this node.
+	 * @param agentid
+	 * @param node
+	 * @param queue
+	 */
+	public void expand(Agent agent, HeuristicFunction func, BinaryHeap<Node> queue) {
+		int agentid = agent.getID(); 
+		ArrayList<Node> successors = new ArrayList<Node>();
+		//update heuristic
+		Vector<ATPmove> availableMoves = this.state.availableMovesOf(agentid);
+		//start expanding
+		while (!availableMoves.isEmpty())
+		{
+			ATPmove move = availableMoves.remove(0);
+			ATPstate nextstate = new ATPstate(this.state);
+			double h_value = func.evaluate(this.state, move);
+			nextstate.agentMove(agent, move); //move is legal
+			if (Debug.instance().isDebugOn()){
+				System.out.println("target="+move.getTarget()+
+						" price="+nextstate.getAgentScore(agentid)+" h_value="+h_value);
+			}
+			if (!agent.isRepeatedState(nextstate)){
+				Node child = new Node(nextstate, move, this, nextstate.getAgentScore(agentid), 
+						h_value, this.comparator);
+				successors.add(0, child);
+				queue.add(child);
+			} else if (Debug.instance().isDebugOn()){
+				System.out.println("repeated state on move to "+move.getTarget());
+			}
+		}
+		this.setSuccessors(successors);
 	}
 }
