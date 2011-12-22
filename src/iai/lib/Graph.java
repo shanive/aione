@@ -9,10 +9,19 @@ import java.util.ArrayList;
  */
 
 public class Graph {
+	/**
+	 * Neighbor of a node 
+	 */
 	public static class Neighbor {
+		/** the other node */
 		public final int v;
+		/** edge weight */
 		public final double weight;
 
+		/** Constructs a neighbor
+		 * @param v the other node
+		 * @param weight the edge weight 
+		 */
 		Neighbor(int v, double weight) {
 			this.v = v; this.weight = weight;
 		}
