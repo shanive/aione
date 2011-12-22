@@ -1,0 +1,6 @@
+Java package for search algorithms:
+
+ A*
+ RTA*
+ MiniMax(+\alpha-\beta)
+ MaxiMax
