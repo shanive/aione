@@ -9,7 +9,6 @@ public class Dijkstra {
 	private final double[] d;
 	/** vector of predecessors in the shortest path */
 	private final int[] pi;
-	
 	/** node queue */
 	private PriorityQueue<Integer> queue;
 
