@@ -1,4 +1,6 @@
-SOURCES=src/iai/lib/Graph.java
+SOURCES=\
+  src/iai/lib/Graph.java src/iai/lib/Dijkstra.java src/iai/lib/Test.java \
+
 
 all:
 	javac -cp bin -d bin -sourcepath src  $(SOURCES)
