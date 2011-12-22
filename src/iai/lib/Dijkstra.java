@@ -10,6 +10,7 @@ public class Dijkstra {
 	/** vector of predecessors in the shortest path */
 	private final int[] pi;
 	
+	/** node queue */
 	private PriorityQueue<Integer> queue;
 
 	/** 
@@ -63,6 +64,10 @@ public class Dijkstra {
 	 */
 	public int pred(int u) {return pi[u];}
 
+	/**
+	 * a basic test for the Dijkstra algorithm
+	 * @see Test
+	 */
 	public static void test() {
 		Graph g = new Graph(4)
 			.edge(0,1,2.0)
