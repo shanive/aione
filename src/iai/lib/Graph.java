@@ -27,23 +27,21 @@ public class Graph {
 		}
 	}
 
-	/**
-	 * Number of nodes in the graph, nodes are numbered
-	 * from 0 to size-1.
-	 */
+	/** Number of nodes, nodes are numbered from 0 to size-1. */
 	public final int size;
-
-	private final ArrayList<LinkedList<Neighbor>> nodes;
+	/**  Neighborhood list. */
+	private final LinkedList<Neighbor>[] nodes;
 
 	/**
 	 * Constructs a graph of the given size
 	 * with no links
 	 */
+	@SuppressWarnings({"unchecked"})
 	public Graph(int size) {
 		this.size = size;
-		nodes = new ArrayList<LinkedList<Neighbor>>(size);
+		nodes = new LinkedList[size];
 		for(int u = 0; u!=size; ++u)
-			nodes.add(new LinkedList<Neighbor>());
+			nodes[u] = new LinkedList<Neighbor>();
 	}
 
 	/**
@@ -56,7 +54,7 @@ public class Graph {
 	public Graph edge(int u, int v, double weight) {
 		assert 0 <= u && u < size;
 		assert 0 <= v && v < size;
-		nodes.get(u).add(new Neighbor(v, weight));
+		nodes[u].add(new Neighbor(v, weight));
 		return this;
 	}
 
@@ -66,6 +64,6 @@ public class Graph {
 	 * @return the list of neighbors
 	 */
 	public List<Neighbor> neighbors(int u) {
-		return nodes.get(u);
+		return nodes[u];
 	}
 }

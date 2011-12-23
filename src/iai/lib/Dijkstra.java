@@ -74,7 +74,7 @@ public class Dijkstra {
 			.edge(0, 2, 2.0)
 			.edge(0, 3, 5.0)
 			.edge(2, 3, 1.0);
-		Dijkstra d = new Dijkstra(g,0);
+		Dijkstra d = new Dijkstra(g, 0);
 		assert d.dist(0) == 0;
 		assert d.dist(1) == 2.0;
 		assert d.dist(2) == 2.0;
