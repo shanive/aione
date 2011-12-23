@@ -60,7 +60,7 @@ class InOut {
 				int u = Integer.parseInt(toks[1])-1;
 				int v = Integer.parseInt(toks[2])-1;
 				double weight = Double.parseDouble(toks[3].substring(1));
-				boolean clear = toks[3].compareTo("C")==0;
+				boolean clear = toks[4].compareTo("C")==0;
 
 				/* add neighbors in both directions */
 				roads.edge(u, new World.Road(v, weight, clear));
