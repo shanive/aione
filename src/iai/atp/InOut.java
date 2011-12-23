@@ -31,15 +31,25 @@ class InOut {
 		mapr.close();
 		return world;
 	}
+
+	/** checks whether the line is a comment (empty or starts with %)
+	 * @param line the line
+	 * @return true when comment
+	 */
+	private static boolean isCommentLine(String line) {
+		line = line.trim();
+		return line.length()==0 || line.startsWith("%");
+	}
 	
 	private static Graph<World.Road> readGraph(BufferedReader mapr) throws IOException {
 		Graph<World.Road> roads;
 
 		/* graph size */
 		for(;;) {
-			String[] toks = mapr.readLine().split(" ");
-			if(toks[0].length()==0) /* empty line */
+			String line = mapr.readLine();
+			if(isCommentLine(line))
 				continue;
+			String[] toks = line.split(" ");
 			if(toks[0].compareTo("#V")==0) { /* number of nodes */
 				roads = new Graph<World.Road>(Integer.parseInt(toks[1]));
 				break;
@@ -53,9 +63,9 @@ class InOut {
 			String line = mapr.readLine();
 			if(line==null)
 				break;
-			String[] toks = line.split(" ");
-			if(toks[0].length()==0) /* empty line */
+			if(isCommentLine(line))
 				continue;
+			String[] toks = line.split(" ");
 			if(toks[0].compareTo("#E")==0) {
 				int u = Integer.parseInt(toks[1])-1;
 				int v = Integer.parseInt(toks[2])-1;
@@ -81,7 +91,7 @@ class InOut {
 			if(line==null)
 				break; /* end of file, all done */
 			String[] toks = line.split(" ");
-			if(toks[0].length()==0) /* empty line */
+			if(isCommentLine(line))
 				continue;
 			assert toks[0].compareTo("#V")==0; /* only vl are left */
 			int garage = Integer.parseInt(toks[1])-1;

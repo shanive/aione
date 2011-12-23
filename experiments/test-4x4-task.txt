@@ -1,0 +1,13 @@
+% Game parameters: length in moves
+#G 10
+
+% Number of couriers
+#N 2
+
+% list of couriers (from, to, switch cost)
+#T 1 4  0.5
+#T 2 3  0.1 
+
+% agent algorithm
+#A MINIMAX 4
+
