@@ -8,29 +8,11 @@ import java.util.ArrayList;
  * Undirected graph
  */
 
-public class Graph {
-	/**
-	 * Neighbor of a node 
-	 */
-	public static class Neighbor {
-		/** the other node */
-		public final int v;
-		/** edge weight */
-		public final double weight;
-
-		/** Constructs a neighbor
-		 * @param v the other node
-		 * @param weight the edge weight 
-		 */
-		Neighbor(int v, double weight) {
-			this.v = v; this.weight = weight;
-		}
-	}
-
+public class Graph<E extends Edge> {
 	/** Number of nodes, nodes are numbered from 0 to size-1. */
 	public final int size;
-	/**  Neighborhood list. */
-	private final LinkedList<Neighbor>[] nodes;
+	/**  Edgehood list. */
+	private final LinkedList<E>[] nodes;
 
 	/**
 	 * Constructs a graph of the given size
@@ -41,7 +23,7 @@ public class Graph {
 		this.size = size;
 		nodes = new LinkedList[size];
 		for(int u = 0; u!=size; ++u)
-			nodes[u] = new LinkedList<Neighbor>();
+			nodes[u] = new LinkedList<E>();
 	}
 
 	/**
@@ -51,10 +33,10 @@ public class Graph {
 	 * @param weight edge weight
 	 * @return the graph, for cascading
 	 */
-	public Graph edge(int u, int v, double weight) {
+	public Graph<E> edge(int u, E e) {
 		assert 0 <= u && u < size;
-		assert 0 <= v && v < size;
-		nodes[u].add(new Neighbor(v, weight));
+		assert 0 <= e.v && e.v < size;
+		nodes[u].add(e);
 		return this;
 	}
 
@@ -63,7 +45,7 @@ public class Graph {
 	 * @param u the node
 	 * @return the list of neighbors
 	 */
-	public List<Neighbor> neighbors(int u) {
+	public List<E> neighbors(int u) {
 		return nodes[u];
 	}
 }
