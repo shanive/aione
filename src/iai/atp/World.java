@@ -13,7 +13,7 @@ class World {
 		}
 	}
 
-	final Graph<Road> graph;
+	final Graph<Road> roads;
 
 	/**
 	 * Vehicle
@@ -48,8 +48,8 @@ class World {
 
 	final Vehicle[] vehicles;
 
-	World(Graph<Road> graph, Vehicle[] vehicles) {
-		this.graph = graph;
+	World(Graph<Road> roads, Vehicle[] vehicles) {
+		this.roads = roads;
 		this.vehicles = vehicles;
 	}
 }
