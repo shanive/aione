@@ -31,8 +31,8 @@ class InOut {
 		mapr.close();
 		return world;
 	}
-
-	static Graph<World.Road> readGraph(BufferedReader mapr) throws IOException {
+	
+	private static Graph<World.Road> readGraph(BufferedReader mapr) throws IOException {
 		Graph<World.Road> roads;
 
 		/* graph size */
@@ -74,7 +74,7 @@ class InOut {
 		return roads;
 	}
 
-	static World.Vehicle[] readVehicles(BufferedReader mapr) throws IOException {
+	private static World.Vehicle[] readVehicles(BufferedReader mapr) throws IOException {
 		LinkedList<World.Vehicle> vl = new LinkedList<World.Vehicle>();
 		for(;;) {
 			String line = mapr.readLine();
@@ -90,7 +90,9 @@ class InOut {
 			vl.add(new World.Vehicle(garage, cspeed, fspeed));
 		}
 		World.Vehicle[] vehicles = new World.Vehicle[vl.size()];
-		return (World.Vehicle[])vehicles.toArray();
+		for(int i = 0; i!=vehicles.length; ++i)
+			vehicles[i] = vl.removeFirst();
+		return vehicles;
 	}
 
 	/**
