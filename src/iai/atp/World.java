@@ -4,23 +4,19 @@ import iai.lib.Edge;
 import iai.lib.Graph;
 
 class World {
+	enum Algorithm { HUMAN, GREEDY, ASTAR, RTASTAR, MINIMAX, MAXIMAX, SUMISUM }
+	
 	/* Road, an edge that can be either clear or flooded */
 	static class Road extends Edge {
+		/** true when clear */
 		final boolean clear;
 		Road(int v, double weight, boolean clear) {
-			super(v, weight);
-			this.clear = clear;
+			super(v, weight); this.clear = clear;
 		}
 	}
 
-	final Graph<Road> roads;
-
-	/**
-	 * Vehicle
-	 */
+	/** Vehicle */
 	static class Vehicle {
-		/** vehicle name */
-		final String name;
 		/** vehicle garage location */
 		final int garage;
 		/** vehicle speeds on C)lear and F)looded roards */
@@ -34,22 +30,37 @@ class World {
 		 */
 		Vehicle(int garage, double cspeed, double fspeed) {
 			this.garage = garage;
-			this.cspeed = cspeed;
-			this.fspeed = fspeed;
-			this.name = genName();
+			this.cspeed = cspeed; this.fspeed = fspeed;
 		}
-
-		/** increases every time a new vehicle is allocated
-		 * to provide unique names of the engines */
-		private static int namegen = 0;
-		/** automatic name generator */
-		private String genName() {return Integer.toString(namegen++);}
 	}
 
-	final Vehicle[] vehicles;
+	/** Traveller */
+	static class Traveller {
+		/* source and target */
+		final int s, t;
+		/* switch cost */
+		final double twsitch;
+		/* control algorithm */
+		final Algorithm alg;
 
-	World(Graph<Road> roads, Vehicle[] vehicles) {
+		/** constructs Traveller, see class members */
+		Traveller(s, t, tswitch, alg) {
+			this.s = s; this.t = t;
+			this.tswitch = tswitch;
+			this.alg = alg;
+		}
+	}
+
+	/** road graph */
+	final Graph<Road> roads;
+	/**  vehicles, in declaration order */
+	final Vehicle[] vehicles;
+	/** travellers, in declaration order */
+	final Traveller[] travellers;
+
+	World(Graph<Road> roads, Vehicle[] vehicles, Traveller[] travellers) {
 		this.roads = roads;
 		this.vehicles = vehicles;
+		this.travellers = travellers;
 	}
 }
