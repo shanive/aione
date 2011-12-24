@@ -121,6 +121,10 @@ class InOut {
 		return vl.toArray(vehicles);
 	}
 
+	/** Read the  travellers, provided in a separate file (from the world map)
+	 * @param taskr open buffered reader
+	 * @return the array of travellers
+	 */
 	private static World.Traveller[] readTravellers(BufferedReader taskr) throws IOException {
 		LinkedList<World.Traveller> tl = new LinkedList<World.Traveller>();
 		for(;;) {

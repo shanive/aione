@@ -18,7 +18,7 @@ public class Dijkstra {
 	 * @param g the graph
 	 * @param s the source node
 	 */
-	public Dijkstra(Graph<? extends Edge> g, int s) {
+	public Dijkstra(Graph<? extends WEdge> g, int s) {
 		/* allocate tables */
 		queue = new PriorityQueue<Integer>
 			(g.size,
@@ -38,7 +38,7 @@ public class Dijkstra {
 		Integer u;
 		while((u = queue.poll()) != null) {
 			queue.remove(u); /* for buggy java versions */
-			for(Edge nb: g.neighbors(u)) {
+			for(WEdge nb: g.neighbors(u)) {
 				if(d[nb.v] > d[u]+nb.weight) {
 					d[nb.v] = d[u]+nb.weight; pi[nb.v] = u;
 					/* re-insert with new distance */
@@ -68,12 +68,12 @@ public class Dijkstra {
 	 * @see Test
 	 */
 	public static void test() {
-		Graph<Edge> g = new Graph<Edge>(4)
-			.edge(0, new Edge(1, 2.0))
-			.edge(1, new Edge(2, 1.0))
-			.edge(0, new Edge(2, 2.0))
-			.edge(0, new Edge(3, 5.0))
-			.edge(2, new Edge(3, 1.0));
+		Graph<WEdge> g = new Graph<WEdge>(4)
+			.edge(0, new WEdge(1, 2.0))
+			.edge(1, new WEdge(2, 1.0))
+			.edge(0, new WEdge(2, 2.0))
+			.edge(0, new WEdge(3, 5.0))
+			.edge(2, new WEdge(3, 1.0));
 		Dijkstra d = new Dijkstra(g, 0);
 		assert d.dist(0) == 0;
 		assert d.dist(1) == 2.0;

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 public class Graph<E extends Edge> {
 	/** Number of nodes, nodes are numbered from 0 to size-1. */
 	public final int size;
-	/**  Edgehood list. */
+	/**  Neighborhood list. */
 	private final LinkedList<E>[] nodes;
 
 	/**
@@ -28,9 +28,8 @@ public class Graph<E extends Edge> {
 
 	/**
 	 * Adds an edge to the graph
-	 * @param u first edge node
-	 * @param v second edge node
-	 * @param weight edge weight
+	 * @param u the node
+	 * @param e the edge
 	 * @return the graph, for cascading
 	 */
 	public Graph<E> edge(int u, E e) {
