@@ -19,7 +19,7 @@ class Tour {
 		State state = new State(world);
 		for(int left=limit; left!=0; --left) {
 			for(int it = 0; it!=world.travellers.length; ++it) {
-					/* mostly for convenience with human agents:
+					/* mostly for convenience with interactive agents:
 					   ask for a move only if not yet
 					   in the target node */
 				if(state.tloc[it]!=world.travellers[it].t) {

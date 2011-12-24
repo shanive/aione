@@ -91,10 +91,12 @@ final class State {
 		/* if the goal is reached, the only move is stay in place */
 		if(tloc[m.it]==world.travellers[m.it].t)
 			return m.v==tloc[m.it];
+
 		/* is the vehicle valid? */
 		if(tvcl[m.it]!=m.iv   /* vehicle changed */
    		   && vloc[m.iv]==-1) /* but was not available */
 			return false;
+
 		/* is the node reachable? */
 		for(World.Road r: world.roads.neighbors(tloc[m.it]))
 			if(r.v==m.v && (r.clear || world.vehicles[m.iv].fspeed>0.0))
