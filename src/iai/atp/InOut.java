@@ -169,7 +169,7 @@ class InOut {
 	}
 
 	/**
-	 * outputs the debugging message, if the debugging is on 
+	 * outputs the debugging message if the debugging is on.
 	 * @param message the message to output
 	 */
 	static void debug(String message) {
