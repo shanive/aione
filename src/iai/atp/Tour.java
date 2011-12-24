@@ -19,11 +19,16 @@ class Tour {
 		State state = new State(world);
 		for(int left=limit; left!=0; --left) {
 			for(int it = 0; it!=world.travellers.length; ++it) {
-				Move m = agents[it].choose(state, it, left);
-				assert state.isLegal(m);
-				state = new State(state, m, left);
-				if(state.isGoal())
-					return state;
+					/* mostly for convenience with human agents:
+					   ask for a move only if not yet
+					   in the target node */
+				if(state.tloc[it]!=world.travellers[it].t) {
+					Move m = agents[it].choose(state, it, left);
+					assert state.isLegal(m);
+					state = new State(state, m, left);
+					if(state.isGoal())
+						return state;
+				}
 			}
 		}
 		return state;

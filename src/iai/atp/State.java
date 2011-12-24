@@ -56,7 +56,12 @@ final class State {
 		/* move to the new location */
 		tloc[m.it] = m.v;
 		texp[m.it]+= orig.cost(m, left);
-		InOut.debug("cost="+orig.cost(m, left)+" texp="+texp[m.it]);
+
+		/* if the goal is reached, release the vehicle */
+		if(tloc[m.it]==world.travellers[m.it].t && tvcl[m.it]!=-1) {
+			vloc[tvcl[m.it]] = m.v;
+			tvcl[m.it] = -1;
+		}
 	}
 		
 	/** Computes the list of available moves 
@@ -66,11 +71,15 @@ final class State {
 	 */
 	List<Move> moves(int it) {
 		LinkedList<Move> moves = new LinkedList<Move>();
-		for(int iv = 0; iv!=vloc.length; ++iv)
-			if(iv==tvcl[it] || vloc[iv]==tloc[it]) /* either mine or free & here */
-				for(World.Road r : world.roads.neighbors(tloc[it])) 
-					if(r.clear || world.vehicles[iv].fspeed!=0.0)
-						moves.add(new Move(it, r.v, iv));
+		if(tloc[it]==world.travellers[it].t) 
+			/* the only move in the target node is stay in place */
+			moves.add(new Move(it, tloc[it], tvcl[it]));
+		else
+			for(int iv = 0; iv!=vloc.length; ++iv)
+				if(iv==tvcl[it] || vloc[iv]==tloc[it]) /* either mine or free & here */
+					for(World.Road r : world.roads.neighbors(tloc[it])) 
+						if(r.clear || world.vehicles[iv].fspeed!=0.0)
+							moves.add(new Move(it, r.v, iv));
 		return moves;
 	}
 
@@ -79,6 +88,9 @@ final class State {
 	 * @return true when the move is legal 
 	 */
 	boolean isLegal(Move m) {
+		/* if the goal is reached, the only move is stay in place */
+		if(tloc[m.it]==world.travellers[m.it].t)
+			return m.v==tloc[m.it];
 		/* is the vehicle valid? */
 		if(tvcl[m.it]!=m.iv   /* vehicle changed */
    		   && vloc[m.iv]==-1) /* but was not available */
@@ -96,6 +108,10 @@ final class State {
 	 * @return cost 
 	 */
 	double cost(Move m, int left) {
+		if(m.v==tloc[m.it])
+			return 0.0; /* staying in place is free */
+
+		/* otherwise, compute the switch+traversal cost */
 		double cost = 0.0;
 		if(m.iv!=tvcl[m.it])
 			cost+= world.travellers[m.it].cswitch;
@@ -106,6 +122,8 @@ final class State {
 				break;
 			}
 		}
+
+		/* if the traveller is late, add the fine */
 		if(left==1 && m.v!=world.travellers[m.it].t)
 			cost+= World.LATE_FINE;
 		return cost;
