@@ -137,8 +137,8 @@ class InOut {
 			assert toks[0].compareTo("#T")==0;
 			int s = Integer.parseInt(toks[1])-1;
 			int t = Integer.parseInt(toks[2])-1;
-			double tswitch = Double.parseDouble(toks[3]);
-			tl.add(new World.Traveller(s, t, tswitch));
+			double cswitch = Double.parseDouble(toks[3]);
+			tl.add(new World.Traveller(s, t, cswitch));
 		}
 		World.Traveller[] travellers = new World.Traveller[tl.size()];
 		return tl.toArray(travellers);
@@ -164,7 +164,7 @@ class InOut {
 		}
 		out.println("\n% Travellers\n");
 		for(World.Traveller t: world.travellers) {
-			out.println("#T "+(t.s+1)+" "+(t.t+1)+" "+t.tswitch);
+			out.println("#T "+(t.s+1)+" "+(t.t+1)+" "+t.cswitch);
 		}
 	}
 
@@ -182,6 +182,9 @@ class InOut {
 		assert args.length==2;
 		World world = readWorld(args[0], args[1]);
 		printWorld(System.out, world);
+
+		State state = new State(world);
+		System.out.println("\n% initial state: "+state);
 	}
 }
 	

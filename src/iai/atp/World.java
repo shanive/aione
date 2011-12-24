@@ -42,12 +42,12 @@ class World {
 		/* source and target */
 		final int s, t;
 		/* switch cost */
-		final double tswitch;
+		final double cswitch;
 
 		/** constructs Traveller, see class members */
-		Traveller(int s, int t, double tswitch) {
+		Traveller(int s, int t, double cswitch) {
 			this.s = s; this.t = t;
-			this.tswitch = tswitch;
+			this.cswitch = cswitch;
 		}
 	}
 

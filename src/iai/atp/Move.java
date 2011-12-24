@@ -1,7 +1,15 @@
 package iai.atp;
 
+/** a move in the current state */
 final class Move {
+	/** traveller index */
+	final int it;
+	/** target node */
 	final int v;
-	final int ivcl;
-	final double cost;
+	/** vehicle index */
+	final int iv;
+
+	Move(int it, int v, int iv) {
+		this.it = it; this.v = v; this.iv = iv;
+	}
 }
