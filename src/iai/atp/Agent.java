@@ -1,6 +1,6 @@
 package iai.atp;
 
 
-interface Agent {
-	Move choose(State state, int it, int left);
+abstract class Agent {
+	abstract Move choose(State state, int it, int left);
 }

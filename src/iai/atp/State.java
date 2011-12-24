@@ -48,7 +48,8 @@ final class State {
 
 		/* switching vehicle? */
 		if(m.iv!=tvcl[m.it]) {
-			vloc[tvcl[m.it]] = tloc[m.it];      /* drop vehicle */
+			if(tvcl[m.it]!=-1)
+				vloc[tvcl[m.it]] = tloc[m.it];  /* drop vehicle */
 			vloc[m.iv] = -1; tvcl[m.it] = m.iv; /* pick up new vehicle */
 		}
 		
