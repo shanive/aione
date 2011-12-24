@@ -1,6 +1,7 @@
 package iai.atp;
 
 import java.util.List;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 
@@ -16,7 +17,7 @@ class HumanAgent extends Agent {
 
 		/* print current state and moves */
 		System.out.println("state: "+state);
-		System.out.println("moves:");
+		System.out.println("moves for t"+(it+1)+":");
 		for(int im=0; im!=moves.length; ++im) {
 			System.out.println((im+1)+". "+moves[im]+"/"+state.cost(moves[im], left));
 		}
@@ -26,12 +27,17 @@ class HumanAgent extends Agent {
 		try {
 			for(;;) {
 				System.out.print("choose move: ");
-				int im = Integer.parseInt(in.readLine());
-				if(0<im || im<=moves.length)
+				int im;
+				try {
+					im = Integer.parseInt(in.readLine());
+				} catch(NumberFormatException e) {
+					im = 0;
+				}
+				if(0<im && im<=moves.length)
 					return moves[im-1];
 				System.out.print("illegal choice, ");
 			}
-		} catch(Exception e) {
+		} catch(IOException e) {
 			/* this should not really happen, but if the user
 			   closes the input forcefully, select the first available
 			   move */
