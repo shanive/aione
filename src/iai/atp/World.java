@@ -4,8 +4,6 @@ import iai.lib.Edge;
 import iai.lib.Graph;
 
 class World {
-	enum Algorithm { HUMAN, GREEDY, ASTAR, RTASTAR, MINIMAX, MAXIMAX, SUMISUM }
-	
 	/* Road, an edge that can be either clear or flooded */
 	static class Road extends Edge {
 		/** true when clear */
@@ -39,15 +37,12 @@ class World {
 		/* source and target */
 		final int s, t;
 		/* switch cost */
-		final double twsitch;
-		/* control algorithm */
-		final Algorithm alg;
+		final double tswitch;
 
 		/** constructs Traveller, see class members */
-		Traveller(s, t, tswitch, alg) {
+		Traveller(int s, int t, double tswitch) {
 			this.s = s; this.t = t;
 			this.tswitch = tswitch;
-			this.alg = alg;
 		}
 	}
 

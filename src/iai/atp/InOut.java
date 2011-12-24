@@ -25,10 +25,19 @@ class InOut {
 	 * @see World
 	 */
 	static World readWorld(String mapfn, String taskfn) throws IOException {
-		BufferedReader mapr =
-			new BufferedReader(new FileReader(mapfn));
-		World world = new World(readGraph(mapr), readVehicles(mapr));
+		/* read the map */
+		BufferedReader mapr = new BufferedReader(new FileReader(mapfn));
+		Graph<World.Road> roads = readGraph(mapr);
+		World.Vehicle[] vehicles = readVehicles(mapr);
 		mapr.close();
+
+		/* read the task */
+		BufferedReader taskr = new BufferedReader(new FileReader(taskfn));
+		World.Traveller[] travellers = readTravellers(taskr);
+		taskr.close();
+		
+		/* create the world */
+		World world = new World(roads, vehicles, travellers);
 		return world;
 	}
 
@@ -41,6 +50,10 @@ class InOut {
 		return line.length()==0 || line.startsWith("%");
 	}
 	
+	/** reads the graph of roads 
+	 * @param mapr open BufferedReader
+	 * @return road graph
+	 */
 	private static Graph<World.Road> readGraph(BufferedReader mapr) throws IOException {
 		Graph<World.Road> roads;
 
@@ -84,6 +97,11 @@ class InOut {
 		return roads;
 	}
 
+	/** 
+	 * reads of vehicles
+	 * @param mapr open buffered reader positioned at the first vehicle
+	 * @return the array of vehicles
+	 */
 	private static World.Vehicle[] readVehicles(BufferedReader mapr) throws IOException {
 		LinkedList<World.Vehicle> vl = new LinkedList<World.Vehicle>();
 		for(;;) {
@@ -100,9 +118,26 @@ class InOut {
 			vl.add(new World.Vehicle(garage, cspeed, fspeed));
 		}
 		World.Vehicle[] vehicles = new World.Vehicle[vl.size()];
-		for(int i = 0; i!=vehicles.length; ++i)
-			vehicles[i] = vl.removeFirst();
-		return vehicles;
+		return vl.toArray(vehicles);
+	}
+
+	private static World.Traveller[] readTravellers(BufferedReader taskr) throws IOException {
+		LinkedList<World.Traveller> tl = new LinkedList<World.Traveller>();
+		for(;;) {
+			String line = taskr.readLine();
+			if(line==null)
+				break; /* end of file, all done */
+			String[] toks = line.split(" ");
+			if(isCommentLine(line))
+				continue;
+			assert toks[0].compareTo("#T")==0;
+			int s = Integer.parseInt(toks[1])-1;
+			int t = Integer.parseInt(toks[2])-1;
+			double tswitch = Double.parseDouble(toks[3]);
+			tl.add(new World.Traveller(s, t, tswitch));
+		}
+		World.Traveller[] travellers = new World.Traveller[tl.size()];
+		return tl.toArray(travellers);
 	}
 
 	/**
@@ -122,6 +157,10 @@ class InOut {
 		out.println("\n% Vehicles\n");
 		for(World.Vehicle v: world.vehicles) {
 			out.println("#V "+(v.garage+1)+" "+v.cspeed+" "+(v.fspeed/v.cspeed));
+		}
+		out.println("\n% Travellers\n");
+		for(World.Traveller t: world.travellers) {
+			out.println("#T "+(t.s+1)+" "+(t.t+1)+" "+t.tswitch);
 		}
 	}
 
