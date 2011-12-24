@@ -36,8 +36,9 @@ final class State {
 	/** Successor state constructor
 	 * @param orig original state
 	 * @param m move
+	 * @param left number of moves left
 	 */
-	State(State orig, Move m) {
+	State(State orig, Move m, int left) {
 		/* initialize new state from the original state */
 		world = orig.world;
 		vloc = orig.vloc.clone();
@@ -53,7 +54,7 @@ final class State {
 		
 		/* move to the new location */
 		tloc[m.it] = m.v;
-		texp[m.it]+= cost(m);
+		texp[m.it]+= cost(m, left);
 	}
 		
 	/** Computes the list of available moves 
@@ -92,7 +93,7 @@ final class State {
 	 * @param m move
 	 * @return cost 
 	 */
-	double cost(Move m) {
+	double cost(Move m, int left) {
 		double cost = 0.0;
 		if(m.iv!=tvcl[m.it])
 			cost+= world.travellers[m.it].cswitch;
@@ -103,6 +104,8 @@ final class State {
 				break;
 			}
 		}
+		if(left==1 && m.v!=world.travellers[m.it].t)
+			cost+= World.LATE_FINE;
 		return cost;
 	}
 
@@ -148,14 +151,12 @@ final class State {
 	 */
 	public String toString() {
 		String s = "";
-		for(int it=0; it!=tloc.length;++it) {
+		for(int it=0; it!=tloc.length;++it)
 			s+= " t"+(it+1)+"="+(tloc[it]+1)
 				+"("+(tvcl[it]==-1?"_":tvcl[it]+1)+")"
 				+ "/"+texp[it];
-		}
-		for(int iv=0; iv!=vloc.length; ++iv) {
+		for(int iv=0; iv!=vloc.length; ++iv)
 			s+= " v"+(iv+1)+"="+(vloc[iv]==-1?"_":vloc[iv]+1);
-		}
 		return s;
 	}
 }

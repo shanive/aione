@@ -12,4 +12,8 @@ final class Move {
 	Move(int it, int v, int iv) {
 		this.it = it; this.v = v; this.iv = iv;
 	}
+
+	public String toString() {
+		return "t"+(it+1)+"="+(v+1)+"("+(iv+1)+")";
+	}
 }
