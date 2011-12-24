@@ -1,7 +1,6 @@
 package iai.atp;
 
 import java.util.List;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 
@@ -32,7 +31,7 @@ class HumanAgent extends Agent {
 					return moves[im-1];
 				System.out.print("illegal choice, ");
 			}
-		} catch(IOException e) {
+		} catch(Exception e) {
 			/* this should not really happen, but if the user
 			   closes the input forcefully, select the first available
 			   move */

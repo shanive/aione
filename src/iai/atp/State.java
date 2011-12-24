@@ -55,7 +55,8 @@ final class State {
 		
 		/* move to the new location */
 		tloc[m.it] = m.v;
-		texp[m.it]+= cost(m, left);
+		texp[m.it]+= orig.cost(m, left);
+		InOut.debug("cost="+orig.cost(m, left)+" texp="+texp[m.it]);
 	}
 		
 	/** Computes the list of available moves 
