@@ -40,7 +40,6 @@ final class State {
 	/** Successor state constructor
 	 * @param orig original state
 	 * @param m move
-	 * @param left number of moves left
 	 */
 	State(State orig, Move m) {
 		/* initialize new state from the original state */
