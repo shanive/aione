@@ -27,11 +27,11 @@ class Heur {
 		dijkstra = new Dijkstra(world.roads, world.travellers[it].t);
 	}
 
-	/** returns a heuristic (optimistic) cost for a node
+	/** returns a heuristic (optimistic) cost estimate for a node
 	 * @param v the current node
 	 * @return distance from v to the target
 	 */
-	double cost(int v) {
+	double estimate(int v) {
 		return speedfactor*dijkstra.dist(v);
 	}
 }

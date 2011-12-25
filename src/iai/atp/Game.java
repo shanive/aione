@@ -10,10 +10,10 @@ class Game {
 	 * @return an implementation of Agent
 	 * @see Agent
 	 */
-	private static Agent makeAgent(Alg alg, World world) {
+	private static Agent makeAgent(Alg alg, World world, int it) {
 		switch(alg) {
 		case HUMAN:
-			return new HumanAgent();
+			return new HumanAgent(world, it);
 		case MINMAX:
 			return null;
 		case MAXMAX:
@@ -83,8 +83,8 @@ class Game {
 		}
 
 		Agent
-			first = makeAgent(afirst, world),
-			second = makeAgent(asecond, world);
+			first = makeAgent(afirst, world, 0),
+			second = makeAgent(asecond, world, 1);
 		Agent[] agents = {first, second};
 
 		Tour tour = new Tour(world);

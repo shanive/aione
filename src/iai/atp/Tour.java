@@ -23,7 +23,7 @@ class Tour {
 					   ask for a move only if not yet
 					   in the target node */
 				if(state.tloc[it]!=world.travellers[it].t) {
-					Move m = agents[it].choose(state, it, left);
+					Move m = agents[it].choose(state, left);
 					assert state.isLegal(m);
 					state = new State(state, m, left);
 					if(state.isGoal())
