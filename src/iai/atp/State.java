@@ -15,22 +15,25 @@ final class State {
 	final int[] tvcl;
 	/** traveller expenses so far */
 	final double[] texp;
+	final int[] left;
 
 	/** constructs initial state
 	 * @param world the world
 	 */
-	State(World world) {
+	State(World world, int limit) {
 		this.world = world;
 		vloc = new int[world.vehicles.length];
 		tloc = new int[world.travellers.length];
 		tvcl = new int[world.travellers.length];
 		texp = new double[world.travellers.length];
+		left = new int[world.travellers.length];
 		for(int iv=0; iv!=world.vehicles.length; ++iv) {
 			vloc[iv] = world.vehicles[iv].garage;
 		}
 		for(int it=0; it!=world.travellers.length; ++it) {
 			tloc[it] = world.travellers[it].s;
 			tvcl[it] = -1; texp[it] = 0.0;
+			left[it] = limit;
 		}
 	}
 
@@ -39,13 +42,14 @@ final class State {
 	 * @param m move
 	 * @param left number of moves left
 	 */
-	State(State orig, Move m, int left) {
+	State(State orig, Move m) {
 		/* initialize new state from the original state */
 		world = orig.world;
 		vloc = orig.vloc.clone();
 		tloc = orig.tloc.clone();
 		tvcl = orig.tvcl.clone();
 		texp = orig.texp.clone();
+		left = orig.left.clone();
 
 		/* switching vehicle? */
 		if(m.iv!=tvcl[m.it]) {
@@ -56,13 +60,15 @@ final class State {
 		
 		/* move to the new location */
 		tloc[m.it] = m.v;
-		texp[m.it]+= orig.cost(m, left);
+		texp[m.it]+= orig.cost(m);
 
 		/* if the goal is reached, release the vehicle */
 		if(tloc[m.it]==world.travellers[m.it].t && tvcl[m.it]!=-1) {
 			vloc[tvcl[m.it]] = m.v;
 			tvcl[m.it] = -1;
 		}
+
+		--left[m.it]; /* decrease the number of steps left */
 	}
 		
 	/** Computes the list of available moves 
@@ -110,7 +116,7 @@ final class State {
 	 * @param m move
 	 * @return cost 
 	 */
-	double cost(Move m, int left) {
+	double cost(Move m) {
 		if(m.v==tloc[m.it])
 			return 0.0; /* staying in place is free */
 
@@ -127,8 +133,8 @@ final class State {
 		}
 
 		/* if the traveller is late, add the fine */
-		if(left==1 && m.v!=world.travellers[m.it].t)
-			cost+= World.LATE_FINE;
+		if(left[m.it]==1 && m.v!=world.travellers[m.it].t)
+			cost+= World.PENALTY;
 		return cost;
 	}
 

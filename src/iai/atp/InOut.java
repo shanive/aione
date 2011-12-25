@@ -183,7 +183,7 @@ class InOut {
 		World world = readWorld(args[0], args[1]);
 		printWorld(System.out, world);
 
-		State state = new State(world);
+		State state = new State(world, 1);
 		System.out.println("\n% initial state: "+state);
 	}
 }

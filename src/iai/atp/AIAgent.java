@@ -6,6 +6,9 @@ import iai.search.Model;
 /** Artificial Intelligence-based search Agent */
 
 abstract class AIAgent extends Agent implements Model<State,Move> {
+	/** whenever bounded horizon search is involved, limits the search depth */
+	static int HORIZON = 8;
+
 	/** distance heuristic, so that the search is informed */
 	private final Heur[] heur;
 
@@ -25,8 +28,8 @@ abstract class AIAgent extends Agent implements Model<State,Move> {
 	}
 
 	/** see @iai.search.Model */
-	public State succ(State state, Move move, int left) {
-		return new State(state, move, left);
+	public State succ(State state, Move move) {
+		return new State(state, move);
 	}
 
 	/** see @iai.search.Model */
@@ -54,5 +57,5 @@ abstract class AIAgent extends Agent implements Model<State,Move> {
 	/* end of Model */	
 
 	/** still abstract, depends on the search algorithm */
-	abstract Move choose(State state, int it, int left);
+	abstract Move choose(State state, int it);
 }

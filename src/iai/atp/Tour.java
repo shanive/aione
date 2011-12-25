@@ -16,18 +16,18 @@ class Tour {
 	 * @return final state
 	 */
 	State go(Agent[] agents, int limit) {
-		State state = new State(world);
-		for(int left=limit; left!=0; --left) {
+		State state = new State(world, limit);
+		while(limit--!=0) {
 			for(int it = 0; it!=world.travellers.length; ++it) {
 					/* mostly for convenience with interactive agents:
 					   ask for a move only if not yet
 					   in the target node */
-				System.out.println("state: "+state);
 				if(state.tloc[it]!=world.travellers[it].t) {
-					Move m = agents[it].choose(state, it, left);
+					System.out.println("state: "+state);
+					Move m = agents[it].choose(state, it);
 					assert state.isLegal(m);
 					System.out.println("move: "+m);
-					state = new State(state, m, left);
+					state = new State(state, m);
 					if(state.isGoal())
 						return state;
 				}

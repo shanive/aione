@@ -16,5 +16,5 @@ abstract class Agent {
 	 * @param left number of moves left
 	 * @return a move
 	 */
-	abstract Move choose(State state, int it, int left);
+	abstract Move choose(State state, int it);
 }

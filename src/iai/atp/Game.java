@@ -30,9 +30,11 @@ class Game {
 		System.err.print("Usage:\n"+
 						 "\tjava iai.atp.Game [options] map.txt task.txt\n"+
 						 "Options:\n"+
-						 "\t-h print usage and exit\n"+
+						 "\t-help print usage and exit\n"+
 						 "\t-d turn on debugging output\n"+
 						 "\t-l <nnn> set game length\n"+
+						 "\t-h <nnn> search horizon\n"+
+						 "\t-p <nnn> late penalty\n"+
 						 "\t-1 [HUMAN|MINMAX|MAXMAX|SUMMAX] set first agent\n"+
 						 "\t-2 [HUMAN|MINMAX|MAXMAX|SUMMAX] set second agent\n");
 	}
@@ -45,7 +47,7 @@ class Game {
 		/* parse command line arguments */
 		int iarg = 0;
 		while(iarg!=args.length) {
-			if(args[iarg].compareTo("-h")==0) {
+			if(args[iarg].compareTo("-help")==0) {
 				usage();
 				return;
 			} else if(args[iarg].compareTo("-d")==0) {
@@ -53,6 +55,12 @@ class Game {
 			} else if(args[iarg].compareTo("-l")==0) {
 				++iarg;
 				limit = Integer.parseInt(args[iarg]);
+			} else if(args[iarg].compareTo("-h")==0) {
+				++iarg;
+				AIAgent.HORIZON = Integer.parseInt(args[iarg]);
+			} else if(args[iarg].compareTo("-p")==0) {
+				++iarg;
+				World.PENALTY = Double.parseDouble(args[iarg]);
 			} else if(args[iarg].compareTo("-1")==0) {
 				++iarg;
 				afirst = Alg.valueOf(args[iarg]);

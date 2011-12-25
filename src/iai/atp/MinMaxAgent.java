@@ -15,7 +15,7 @@ class MinMaxAgent extends AIAgent {
 		return cost(state, 1-it)-cost(state, it);
 	}
 
-	Move choose(State state, int it, int left) {
-		return minmax.choose(state, it, left);
+	Move choose(State state, int it) {
+		return minmax.choose(state, it, HORIZON);
 	}
 }

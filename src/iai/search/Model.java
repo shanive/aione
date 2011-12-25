@@ -15,7 +15,7 @@ public interface Model<State, Move> {
 	 * @param move the move
 	 * @return the successor state, new allocated
 	 */
-	public State succ(State state, Move move, int left);
+	public State succ(State state, Move move);
 
 	/** goal test
 	 * @param state current state
@@ -25,6 +25,7 @@ public interface Model<State, Move> {
 
 	/** get the state reward, the objective is to maximizes the reward
 	 * @param state the state
+	 * @param it the agent for which the reward is computed
 	 * @return the reward
 	 */
 	public double reward(State state, int it);

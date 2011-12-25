@@ -11,7 +11,7 @@ class HumanAgent extends Agent {
 		super(world);
 	}
 
-	Move choose(State state, int it, int left) {
+	Move choose(State state, int it) {
 		/* retrieve all available moves */
 		List<Move> ml = state.moves(it);
 		Move[] moves = new Move[ml.size()];
@@ -20,7 +20,7 @@ class HumanAgent extends Agent {
 		/* print current state and moves */
 		System.out.println("moves for t"+(it+1)+":");
 		for(int im=0; im!=moves.length; ++im) {
-			System.out.println((im+1)+". "+moves[im]+"/"+state.cost(moves[im], left));
+			System.out.println((im+1)+". "+moves[im]+"/"+state.cost(moves[im]));
 		}
 
 		/* let the human choose a move by the number */
