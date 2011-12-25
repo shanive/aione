@@ -14,6 +14,6 @@ final class Move {
 	}
 
 	public String toString() {
-		return "t"+(it+1)+"="+(v+1)+"("+(iv==-1?"_":iv+1)+")";
+		return String.format("t%d=%d(%d)", it+1, v+1, iv+1);
 	}
 }

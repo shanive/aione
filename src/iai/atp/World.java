@@ -5,7 +5,7 @@ import iai.lib.Graph;
 
 class World {
 	/** added to the move cost when goal is not reached and no moves left */
-	final static double LATE_FINE = 1E10;
+	final static double LATE_FINE = 100.0;
 
 	/** Road, an edge that can be either clear or flooded */
 	static class Road extends WEdge {

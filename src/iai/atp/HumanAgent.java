@@ -18,7 +18,6 @@ class HumanAgent extends Agent {
 		moves = ml.toArray(moves);
 
 		/* print current state and moves */
-		System.out.println("state: "+state);
 		System.out.println("moves for t"+(it+1)+":");
 		for(int im=0; im!=moves.length; ++im) {
 			System.out.println((im+1)+". "+moves[im]+"/"+state.cost(moves[im], left));

@@ -29,6 +29,11 @@ abstract class AIAgent extends Agent implements Model<State,Move> {
 		return new State(state, move, left);
 	}
 
+	/** see @iai.search.Model */
+	public boolean isGoal(State state) {
+		return state.isGoal();
+	}
+
 	/** state cost; if the state is a terminal state
 	 * for the agent, then the cost is the accumulated
 	 * expenses; otherwise, an heuristic estimate of

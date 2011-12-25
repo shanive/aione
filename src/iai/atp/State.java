@@ -2,6 +2,7 @@ package iai.atp;
 
 import java.util.List;
 import java.util.LinkedList;
+import java.text.DecimalFormat;
 
 /** World state, gets copied a lot, make it final */
 final class State {
@@ -174,11 +175,10 @@ final class State {
 	public String toString() {
 		String s = "";
 		for(int it=0; it!=tloc.length;++it)
-			s+= " t"+(it+1)+"="+(tloc[it]+1)
-				+"("+(tvcl[it]==-1?"_":tvcl[it]+1)+")"
-				+ "/"+texp[it];
+			s+= String.format
+				(" t%d=%d(%d)/%5g", it+1, tloc[it]+1, tvcl[it]+1, texp[it]);
 		for(int iv=0; iv!=vloc.length; ++iv)
-			s+= " v"+(iv+1)+"="+(vloc[iv]==-1?"_":vloc[iv]+1);
+			s+= String.format(" v%d=%d", iv+1, vloc[iv]+1);
 		return s;
 	}
 }

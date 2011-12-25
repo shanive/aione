@@ -17,6 +17,12 @@ public interface Model<State, Move> {
 	 */
 	public State succ(State state, Move move, int left);
 
+	/** goal test
+	 * @param state current state
+	 * @return true when goal state
+	 */
+	public boolean isGoal(State state);
+
 	/** get the state reward, the objective is to maximizes the reward
 	 * @param state the state
 	 * @return the reward

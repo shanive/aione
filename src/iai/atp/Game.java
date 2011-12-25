@@ -15,7 +15,7 @@ class Game {
 		case HUMAN:
 			return new HumanAgent(world);
 		case MINMAX:
-			return null;
+			return new MinMaxAgent(world);
 		case MAXMAX:
 			return null;
 		case SUMMAX:
@@ -88,7 +88,7 @@ class Game {
 
 		Tour tour = new Tour(world);
 		State state = tour.go(agents, limit);
-		System.out.println("final state: "+state);
+		System.out.println("final: "+state);
 	}
 		
 }

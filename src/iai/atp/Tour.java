@@ -22,9 +22,11 @@ class Tour {
 					/* mostly for convenience with interactive agents:
 					   ask for a move only if not yet
 					   in the target node */
+				System.out.println("state: "+state);
 				if(state.tloc[it]!=world.travellers[it].t) {
 					Move m = agents[it].choose(state, it, left);
 					assert state.isLegal(m);
+					System.out.println("move: "+m);
 					state = new State(state, m, left);
 					if(state.isGoal())
 						return state;
