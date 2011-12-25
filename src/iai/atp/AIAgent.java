@@ -22,17 +22,17 @@ abstract class AIAgent extends Agent implements Model<State,Move> {
 	}
 	
 	/* partial implementation of Model */
-	/** see @iai.search.Model */
+	/** @see iai.search.Model */
 	public List<Move> moves(State state, int it) {
 		return state.moves(it);
 	}
 
-	/** see @iai.search.Model */
+	/** @see iai.search.Model */
 	public State succ(State state, Move move) {
 		return new State(state, move);
 	}
 
-	/** see @iai.search.Model */
+	/** @see iai.search.Model */
 	public boolean isGoal(State state) {
 		return state.isGoal();
 	}

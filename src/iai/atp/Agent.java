@@ -13,7 +13,7 @@ abstract class Agent {
 
 	/** choose a move 
 	 * @param state current state
-	 * @parm it the traveller
+	 * @param it the traveller
 	 * @return a move
 	 */
 	abstract Move choose(State state, int it);

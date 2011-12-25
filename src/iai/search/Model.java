@@ -13,7 +13,7 @@ public interface Model<State, Move> {
 	/** generate the successor state
 	 * @param state the current state
 	 * @param move the move
-	 * @return the successor state, new allocated
+	 * @return the successor state, newly allocated
 	 */
 	public State succ(State state, Move move);
 
