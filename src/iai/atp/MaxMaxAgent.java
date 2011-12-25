@@ -12,7 +12,7 @@ class MaxMaxAgent extends AIAgent {
 
 	/** @see iai.search.Model */
 	public double reward(State state, int it) {
-		return cost(state, it);
+		return -cost(state, it);
 	}
 
 	Move choose(State state, int it) {
