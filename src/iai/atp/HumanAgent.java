@@ -7,11 +7,11 @@ import java.io.BufferedReader;
 
 /** Human agent */
 class HumanAgent extends Agent {
-	HumanAgent(World world, int it) {
-		super(world, it);
+	HumanAgent(World world) {
+		super(world);
 	}
 
-	Move choose(State state, int left) {
+	Move choose(State state, int it, int left) {
 		/* retrieve all available moves */
 		List<Move> ml = state.moves(it);
 		Move[] moves = new Move[ml.size()];

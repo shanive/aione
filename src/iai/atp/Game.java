@@ -10,10 +10,10 @@ class Game {
 	 * @return an implementation of Agent
 	 * @see Agent
 	 */
-	private static Agent makeAgent(Alg alg, World world, int it) {
+	private static Agent makeAgent(Alg alg, World world) {
 		switch(alg) {
 		case HUMAN:
-			return new HumanAgent(world, it);
+			return new HumanAgent(world);
 		case MINMAX:
 			return null;
 		case MAXMAX:
@@ -36,7 +36,6 @@ class Game {
 						 "\t-1 [HUMAN|MINMAX|MAXMAX|SUMMAX] set first agent\n"+
 						 "\t-2 [HUMAN|MINMAX|MAXMAX|SUMMAX] set second agent\n");
 	}
-						   
 						   
     /** command-line driver for the game player */
 	public static void main(String[] args) throws java.io.IOException {
@@ -82,9 +81,9 @@ class Game {
 			return;
 		}
 
-		Agent
-			first = makeAgent(afirst, world, 0),
-			second = makeAgent(asecond, world, 1);
+		/* create agents, agents are reusable */
+		Agent first = makeAgent(afirst, world);
+		Agent second = afirst==asecond? first : makeAgent(asecond, world);
 		Agent[] agents = {first, second};
 
 		Tour tour = new Tour(world);

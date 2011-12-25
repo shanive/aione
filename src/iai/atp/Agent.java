@@ -5,12 +5,10 @@ package iai.atp;
  */
 abstract class Agent {
 	protected final World world;
-	protected final int it;
 
 	/** Constructs the Agent */
-	Agent(World world, int it) {
+	Agent(World world) {
 		this.world = world;
-		this.it = it;
 	}
 
 	/** choose a move 
@@ -18,5 +16,5 @@ abstract class Agent {
 	 * @param left number of moves left
 	 * @return a move
 	 */
-	abstract Move choose(State state, int left);
+	abstract Move choose(State state, int it, int left);
 }
