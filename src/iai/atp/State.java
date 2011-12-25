@@ -15,6 +15,7 @@ final class State {
 	final int[] tvcl;
 	/** traveller expenses so far */
 	final double[] texp;
+	/** steps left for each of the travellers */
 	final int[] left;
 
 	/** constructs initial state

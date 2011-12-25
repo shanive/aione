@@ -15,15 +15,15 @@ public class MinMax<State,Move> {
 	
 	/** chooses move
 	 * @param state current state
-	 * @param it number of player, must be 0 or 1
+	 * @param ip number of player, must be 0 or 1
 	 * @param depth maximum tree depth, in plies
 	 * @return next move
 	 */
-	public Move choose(State state, int it, int depth) {
+	public Move choose(State state, int ip, int depth) {
 		double vmax = Double.NEGATIVE_INFINITY;
 		Move best = null;
-		for(Move m: model.moves(state, it)) {
-			double v = minVal(model.succ(state, m), it, 1-it,
+		for(Move m: model.moves(state, ip)) {
+			double v = minVal(model.succ(state, m), ip, 1-ip,
 							  Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
 							  depth);
 			if(v > vmax) {
@@ -35,20 +35,20 @@ public class MinMax<State,Move> {
 
 	/** minValue step of MinMax
 	 * @param state current state
-	 * @param it top-level player
-	 * @param jt current player
+	 * @param ip top-level player
+	 * @param jp current player
 	 * @param alpha alpha, read the book
 	 * @param beta beta, read the book
 	 * @param depth remaining search depth
 	 * @return optimum move value
 	 */
-	private double minVal(State state, int it, int jt,
+	private double minVal(State state, int ip, int jp,
 						  double alpha, double beta, int depth) {
 		if(model.isGoal(state) || depth==0)
-			return model.reward(state, it);
+			return model.reward(state, ip);
 		double vmin = Double.POSITIVE_INFINITY;
-		for(Move m: model.moves(state, jt)) {
-			double v = maxVal(model.succ(state, m), it, 1-jt,
+		for(Move m: model.moves(state, jp)) {
+			double v = maxVal(model.succ(state, m), ip, 1-jp,
 							  alpha, beta, depth-1);
 			if(v < vmin)
 				vmin = v;
@@ -62,20 +62,20 @@ public class MinMax<State,Move> {
 
 	/** maxValue step of MinMax
 	 * @param state current state
-	 * @param it top-level player
-	 * @param jt current player
+	 * @param ip top-level player
+	 * @param jp current player
 	 * @param alpha alpha, read the book
 	 * @param beta beta, read the book
 	 * @param depth remaining search depth
 	 * @return optimum move value
 	 */
-	private double maxVal(State state, int it, int jt,
+	private double maxVal(State state, int ip, int jp,
 						  double alpha, double beta, int depth) {
 		if(model.isGoal(state) || depth==0)
-			return model.reward(state, it);
+			return model.reward(state, ip);
 		double vmax = Double.NEGATIVE_INFINITY;
-		for(Move m: model.moves(state, jt)) {
-			double v = minVal(model.succ(state, m), it, 1-jt,
+		for(Move m: model.moves(state, jp)) {
+			double v = minVal(model.succ(state, m), ip, 1-jp,
 							  alpha, beta, depth-1);
 			if(v > vmax)
 				vmax = v;

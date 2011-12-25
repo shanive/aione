@@ -6,9 +6,10 @@ import java.util.List;
 public interface Model<State, Move> {
 	/** Compute the list of moves in current state
 	 * @param state the current state
+	 * @param ip player index
 	 * @return the list of moves 
 	 */
-	public List<Move> moves(State state, int it);
+	public List<Move> moves(State state, int ip);
 
 	/** generate the successor state
 	 * @param state the current state
@@ -25,8 +26,8 @@ public interface Model<State, Move> {
 
 	/** get the state reward, the objective is to maximizes the reward
 	 * @param state the state
-	 * @param it the agent for which the reward is computed
+	 * @param ip the player for which the reward is computed
 	 * @return the reward
 	 */
-	public double reward(State state, int it);
+	public double reward(State state, int ip);
 }
