@@ -110,8 +110,7 @@ public class ATPstate {
 					avails.add(new ATPmove(edge.getTarget(), vehicle.getVehicleId()));
 			}
 		}
-		// should stay-in-place be added
-		// avails.add(new ATPmove(pos, this.agentVehicle(agentid)));
+		avails.add(new ATPmove(pos, this.agentVehicle(agentid)));
 		return avails;
 	}
 
@@ -124,6 +123,8 @@ public class ATPstate {
 	 * @return true if move is legal and false otherwise
 	 */
 	public boolean agentMove(Agent agent, ATPmove move){
+		if(getAgentPosition(agent.getID())==move.getTarget())
+			return true; /* stay in place */
 
 		ATPvehicle vehicle = ATPgraph.instance().getVehicle(move.getVehicleID());
 

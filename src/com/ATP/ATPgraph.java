@@ -69,8 +69,11 @@ public class ATPgraph {
 		return null;
 	}
 
+	/** return vehicle if available, null if not available or no vehicle (-1) */
 	public ATPvehicle getVehicle(int id){
-		return this.vehicles.get(id);
+		return id == -1?
+			     null
+			   : this.vehicles.get(id);
 	}
 
 	public int verticesNum()

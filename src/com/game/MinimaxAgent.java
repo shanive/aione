@@ -19,17 +19,19 @@ import com.tree.SearchAgent;
  */
 public class MinimaxAgent extends SearchAgent{
 	protected int opponentID;
+	protected int opponentGoal;
 	protected GreedyHeuristic opponentHeuristic;
 
-	public MinimaxAgent(int id, int initial, int target, int opponent, int opponentTarget,int cutoff){
-		super(id, initial, target, new GreedyHeuristic(id, target), cutoff);
+	public MinimaxAgent(int id, int initial, int goal, int opponent, int opponentGoal,int cutoff){
+		super(id, initial, goal, new GreedyHeuristic(id, goal), cutoff);
 		this.opponentID = opponent;
-		this.opponentHeuristic = new GreedyHeuristic(opponent, opponentTarget);
+		this.opponentGoal = opponentGoal;
+		this.opponentHeuristic = new GreedyHeuristic(opponent, opponentGoal);
 	}
 
 	@Override
 	public ATPmove nextMove(ATPstate state) {
-		return this.alphaBetaSearch(state);
+		return alphaBetaSearch(state);
 	}
 
 	/**
@@ -40,18 +42,22 @@ public class MinimaxAgent extends SearchAgent{
 	protected ATPmove alphaBetaSearch(ATPstate state){
 		double value = 0;
 		ATPmove move = null;
-		Node current = new Node(state, null, null, 0.0, 0.0, this.comparator);
+		Node current = new Node(state, null, null, 0.0, 0.0, comparator);
 		
-		value = this.maxValue(current, -Double.MAX_VALUE, Double.MAX_VALUE);
-		
+		value = maxValue(current, -Double.MAX_VALUE, Double.MAX_VALUE);
+	   
 		Iterator<Node> it = current.getSuccessors().iterator();
+		System.out.println("begin ALPHA-BETA");
 		while (it.hasNext()){
 			Node succ = it.next();
+			succ.getState().printer();
+			System.out.println("optimal-cost="+succ.getOptimalCost()+" value="+value);
 			if (succ.getOptimalCost() == value){
 				move = succ.getAction();
-				break;
+				// break;
 			}
 		}
+		System.out.println("end ALPHA-BETA");
 		return move;
 	}
 
@@ -65,23 +71,28 @@ public class MinimaxAgent extends SearchAgent{
 		double value = 0.0;
 		//if depth is even then it's my turn. else, it's my opponent turn
 		boolean isOpponent = current.getDepth() % 2 != 0;
-		if (this.terminalState(current.getState())){
-				value = this.result(current.getState());
+		System.out.println("depth="+current.getDepth()+" opponent="+isOpponent);
+		if (terminalState(current.getState())){
+				value = result(current.getState());
+				System.out.println("value="+value+" in terminalState:");
+				current.getState().printer();
 		}
-		else if (current.getDepth() == this.depth){
-				value = this.EVAL(current);
+		else if (current.getDepth() == depth){
+				value = EVAL(current);
+				System.out.println("value="+value+" in leaf State:");
+				current.getState().printer();
 		}
 		else{
-			double alpha = currAlpha , beta = currBeta;
+			double alpha = currAlpha, beta = currBeta;
 			BinaryHeap<Node> queue = new BinaryHeap<Node>();
 			Agent agent = null;
 			HeuristicFunction hf = null;
 			if (isOpponent) {
 				value = Double.MAX_VALUE;
-				agent = ATPgraph.instance().getAgentByID(this.opponentID);
-				hf = this.opponentHeuristic;
+				agent = ATPgraph.instance().getAgentByID(opponentID);
+				hf = opponentHeuristic;
 			}
-			else{
+			else{ 
 				value = -Double.MAX_VALUE;
 				agent = this;
 				hf = this.h;
@@ -91,23 +102,26 @@ public class MinimaxAgent extends SearchAgent{
 			if(isOpponent) {	
 				while (!queue.isEmpty()){
 					Node succ = queue.remove();
-					value = Math.min(value, this.maxValue(succ, alpha, beta));
-					//					if (value <= alpha)
-					//	break;
+					System.out.println("Opponent moves to state:");
+					succ.getState().printer();
+					value = Math.min(value, maxValue(succ, alpha, beta));
+					if (value <= alpha)
+						break;
 					beta = Math.min(beta, value);
 				}
 			} else {
 				while (!queue.isEmpty()){
 					Node succ = queue.remove();
-					value = Math.max(value, this.minValue(succ, alpha, beta));
-					//if (value >= beta)
-					//	break;
+					System.out.println("I move to state:");
+					succ.getState().printer();
+					value = Math.max(value, minValue(succ, alpha, beta));
+					if (value >= beta)
+						break;
 					alpha = Math.max(alpha, value);
 				}
 			}
 		}
 		current.setOptimalCost(value);
-		System.err.println("depth="+current.getDepth()+" value="+value);
 		return value;
 	}
 
@@ -131,11 +145,12 @@ public class MinimaxAgent extends SearchAgent{
 	}
 
 	protected double result(ATPstate state){
-		return (state.getAgentScore(this.opponentID) - state.getAgentScore(this.ID));
+		return (state.getAgentScore(opponentID) - state.getAgentScore(ID));
 	}
 
 	protected boolean terminalState(ATPstate state){
-		return (state.getAgentPosition(this.ID) == this.goal);
+		return (state.getAgentPosition(ID) == goal
+				&& state.getAgentPosition(opponentID)==opponentGoal);
 	}
 	
 	
@@ -147,11 +162,12 @@ public class MinimaxAgent extends SearchAgent{
 	protected double EVAL(Node node){
 		ATPstate state = node.getState();
 		//opponentCost is the estimated cost of the opponent to reach his goal (f)
-		double opponentCost = state.getAgentScore(this.opponentID) +
-									this.opponentHeuristic.getShortestDistance(
+		double opponentCost = state.getAgentScore(opponentID) +
+									opponentHeuristic.getShortestDistance(
 											state.getAgentPosition(opponentID));
 		//myCost is my estimated cost to reach my goal (f)
-		double myCost = node.getPathCost() + node.getHeuristicValue();
+		double myCost = state.getAgentScore(ID) + h.getShortestDistance(state.getAgentPosition(ID));
+		System.out.println("opponentCost="+opponentCost+" myCost="+myCost);
 		return (opponentCost - myCost);
 	}
 								
