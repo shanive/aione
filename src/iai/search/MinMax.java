@@ -2,12 +2,23 @@ package iai.search;
 
 /** MinMax with alpha-beta pruning */
 public class MinMax<State,Move> {
+	/** model to which the search is applied */
 	private final Model<State,Move> model;
 
+	/** initializes search (binds to the model)
+	 * @param model the model
+	 * @see iai.search.Model
+	 */
 	public MinMax(Model<State,Move> model) {
 		this.model = model;
 	}
 	
+	/** chooses move
+	 * @param state current state
+	 * @param it number of player, must be 0 or 1
+	 * @param depth maximum tree depth, in plies
+	 * @return next move
+	 */
 	public Move choose(State state, int it, int depth) {
 		double vmax = Double.NEGATIVE_INFINITY;
 		Move best = null;
@@ -22,6 +33,15 @@ public class MinMax<State,Move> {
 		return best;
 	}
 
+	/** minValue step of MinMax
+	 * @param state current state
+	 * @param it top-level player
+	 * @param jt current player
+	 * @param alpha alpha, read the book
+	 * @param beta beta, read the book
+	 * @param depth remaining search depth
+	 * @return optimum move value
+	 */
 	private double minVal(State state, int it, int jt,
 						  double alpha, double beta, int depth) {
 		if(model.isGoal(state) || depth==0)
@@ -40,6 +60,15 @@ public class MinMax<State,Move> {
 		return vmin;
 	}
 
+	/** maxValue step of MinMax
+	 * @param state current state
+	 * @param it top-level player
+	 * @param jt current player
+	 * @param alpha alpha, read the book
+	 * @param beta beta, read the book
+	 * @param depth remaining search depth
+	 * @return optimum move value
+	 */
 	private double maxVal(State state, int it, int jt,
 						  double alpha, double beta, int depth) {
 		if(model.isGoal(state) || depth==0)
