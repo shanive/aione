@@ -1,6 +1,6 @@
 package iai.atp;
 
-enum Alg { HUMAN, MINMAX, MAXMAX, SUMMAX }
+enum Alg { HUMAN, MINMAX, MAXMAX, MAXSUM }
 
 /** Game playing main function */
 class Game {
@@ -18,8 +18,8 @@ class Game {
 			return new MinMaxAgent(world);
 		case MAXMAX:
 			return null;
-		case SUMMAX:
-			return null;
+		case MAXSUM:
+			return new MaxSumAgent(world);
 		default:
 			return null;
 		}
@@ -35,8 +35,8 @@ class Game {
 						 "\t-l <nnn> set game length\n"+
 						 "\t-h <nnn> search horizon\n"+
 						 "\t-p <nnn> late penalty\n"+
-						 "\t-1 [HUMAN|MINMAX|MAXMAX|SUMMAX] set first agent\n"+
-						 "\t-2 [HUMAN|MINMAX|MAXMAX|SUMMAX] set second agent\n");
+						 "\t-1 [HUMAN|MINMAX|MAXMAX|MAXSUM] set first agent\n"+
+						 "\t-2 [HUMAN|MINMAX|MAXMAX|MAXSUM] set second agent\n");
 	}
 						   
     /** command-line driver for the game player */

@@ -4,6 +4,8 @@ package iai.search;
 public class MinMax<State,Move> {
 	/** model to which the search is applied */
 	private final Model<State,Move> model;
+	/** the algorithm needs some +/-infinity bound to calculate alpha, beta */
+	private final static Double INF = Double.POSITIVE_INFINITY/2.0;
 
 	/** initializes search (binds to the model)
 	 * @param model the model
@@ -20,12 +22,11 @@ public class MinMax<State,Move> {
 	 * @return next move
 	 */
 	public Move choose(State state, int ip, int depth) {
-		double vmax = Double.NEGATIVE_INFINITY;
+		double vmax = -INF;
 		Move best = null;
 		for(Move m: model.moves(state, ip)) {
 			double v = minVal(model.succ(state, m), ip, 1-ip,
-							  Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY,
-							  depth);
+							  -INF, +INF, depth);
 			if(v > vmax) {
 				vmax = v; best = m;
 			}
@@ -44,12 +45,13 @@ public class MinMax<State,Move> {
 	 */
 	private double minVal(State state, int ip, int jp,
 						  double alpha, double beta, int depth) {
+		--depth;
 		if(model.isGoal(state) || depth==0)
 			return model.reward(state, ip);
-		double vmin = Double.POSITIVE_INFINITY;
+		double vmin = INF;
 		for(Move m: model.moves(state, jp)) {
 			double v = maxVal(model.succ(state, m), ip, 1-jp,
-							  alpha, beta, depth-1);
+							  alpha, beta, depth);
 			if(v < vmin)
 				vmin = v;
 			if(vmin <= alpha)
@@ -71,12 +73,13 @@ public class MinMax<State,Move> {
 	 */
 	private double maxVal(State state, int ip, int jp,
 						  double alpha, double beta, int depth) {
+		--depth;
 		if(model.isGoal(state) || depth==0)
 			return model.reward(state, ip);
-		double vmax = Double.NEGATIVE_INFINITY;
+		double vmax = -INF;
 		for(Move m: model.moves(state, jp)) {
 			double v = minVal(model.succ(state, m), ip, 1-jp,
-							  alpha, beta, depth-1);
+							  alpha, beta, depth);
 			if(v > vmax)
 				vmax = v;
 			if(vmax >= beta)

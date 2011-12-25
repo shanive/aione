@@ -26,7 +26,6 @@ class Heur {
 		/* now, build a optimistic weighted graph with weights computed
 		   for the best vehicle for each road */
 		Graph<WEdge> owg = new Graph<WEdge>(world.roads.size);
-
 		for(int u = 0; u!=owg.size; ++u) {
 			for(World.Road r: world.roads.neighbors(u)) {
 				if(r.clear) {
