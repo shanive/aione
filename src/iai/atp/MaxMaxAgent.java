@@ -1,13 +1,13 @@
 package iai.atp;
 
-import iai.search.MaxSum;
+import iai.search.MaxMax;
 
 class MaxMaxAgent extends AIAgent {
 	private final MaxMax<State,Move> maxmax;
 
 	MaxMaxAgent(World world) {
 		super(world);
-		maxmax = new MaxSum<State,Move>(this);
+		maxmax = new MaxMax<State,Move>(this);
 	}
 
 	/** @see iai.search.Model */

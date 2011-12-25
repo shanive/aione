@@ -17,7 +17,7 @@ class Game {
 		case MINMAX:
 			return new MinMaxAgent(world);
 		case MAXMAX:
-			return null;
+			return new MaxMaxAgent(world);
 		case MAXSUM:
 			return new MaxSumAgent(world);
 		default:
