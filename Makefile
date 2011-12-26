@@ -27,4 +27,13 @@ doc:
 clean:
 	find . -name '*.class' | xargs rm
 
+.PHONY: asgn2
 
+asgn2: asgn2.zip
+asgn2.zip:
+	zip asgn2.zip `find src/iai -name '*.java'` \
+		`find bin/iai -name '*.class'` \
+		exp/maxadv-*.txt exp/copadv-*.txt \
+		exp/test-4x4.txt exp/test-4x4-task.txt \
+		exp/test-7x4.txt exp/test-7x4-task.txt \
+		Makefile
