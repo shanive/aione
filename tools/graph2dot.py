@@ -8,7 +8,7 @@ for line in sys.stdin:
 	if words[0]=="#V":
 		break
 
-print "graph ATP {\n  rankdir=LR;\n"
+print "graph ATP {\n  rankdir=LR;\n  node [shape=ellipse];\n"
 for line in sys.stdin:
 	words = line.split()
 	if not words:
