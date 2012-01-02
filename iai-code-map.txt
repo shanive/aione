@@ -1,0 +1,45 @@
+= Code Map for iai
+
+src/iai:
+  lib     - general algorithms and data structures (Edge, Graph, Dijkstra, etc.)
+  search  - generic implementation of search algorithms (MinMax,  MaxMax, MaxSum)
+  atp     - american traveller problem 
+
+src/iai/lib:
+  Graph.java - graph, parameterized by edge, implemented as adjacency list
+  Edge.java  - edge, simply the other end of the arc
+  WEdge.java - weighted edge, used in Dijkstra
+  Dijkstra.java - Dijkstra algorithm for computing distances in positively
+                  weighted graph
+  Test.java  - a simple test for the Dijkstra algorithm
+
+src/iai/search:
+  Model.java - search model abstraction (moves, successors, goal, reward)
+  MinMax.java - generic implementation of MinMax (zero-sum game)
+  MaxMax.java - generic implementation of MaxMax (non-zero-sum game)
+  MaxSum.java - generic implementation of MaxSum (cooperative game)
+
+src/iai/atp:
+  World.java - ATP world definition (graph, vehicles, travellers
+               in initial locations)
+  InOut.java - Static methods for reading and dumping the world definition, debugging
+  State.java - world state (current positions of travellers and vehicles, time left)
+  Move.java  - action (traveller moves into a node with a vehicle)
+  Tour.java  - the world mechanism (travellers move in an alternate fashion until
+               the time is over or the goal is reached)
+  Game.java  - the command-line driver for a two player game
+  Agent.java - an agent abstraction (used by tour to select a move)
+  HumanAgent.java - the human agent, displays a list of available moves
+                    and lets the user choose
+  AIAgent.java - abstract AI agent, implements a search model used by
+                 search algorithms
+  MinMaxAgent.java - MinMax agent, uses MinMax algorithm from iai/search to
+                     select a move, implements reward as -difference
+  MaxMaxAgent.java - MaxMax agent, uses MaxMax algorithm from iai/search to
+                     select a move, implements reward as -cost, needs both rewards
+  MaxSumAgent.java -  MaxSum agent, uses MaxSum algorithm from iai/search to
+                     select a move, implements reward as -sum
+  Heur.java - distance-to-goal heuristic, Dijkstra based, used to calculate
+              reward in non-terminal nodes
+  
+
